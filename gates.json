@@ -24,25 +24,27 @@
     }
   },
   "XOR": {
-    "size": [4, 1, 5],
+    "size": [5, 1, 5],
     "num_inputs": 2,
     "num_outputs": 1,
-    "input_offsets": [0, 3],
-    "output_offsets": [1],
+    "input_offsets": [0, 4],
+    "output_offsets": [2],
     "blocks": {
       "0,0,0": "minecraft:repeater[facing=north]",
-      "3,0,0": "minecraft:repeater[facing=north]",
-      "0,0,1": "minecraft:redstone_wire[east=side,north=side,south=side,west=none]",
-      "1,0,1": "minecraft:redstone_wire[east=side,north=none,south=side,west=side]",
-      "2,0,1": "minecraft:redstone_wire[east=side,north=none,south=side,west=side]",
-      "3,0,1": "minecraft:redstone_wire[east=none,north=side,south=side,west=side]",
-      "0,0,2": "minecraft:redstone_wire[east=side,north=side,south=none,west=none]",
+      "4,0,0": "minecraft:repeater[facing=north]",
+      "0,0,1": "minecraft:redstone_wire",
+      "1,0,1": "minecraft:redstone_wire",
+      "2,0,1": "minecraft:redstone_wire",
+      "3,0,1": "minecraft:redstone_wire",
+      "4,0,1": "minecraft:redstone_wire",
+      "0,0,2": "minecraft:redstone_wire",
       "1,0,2": "minecraft:comparator[facing=north,mode=subtract]",
-      "2,0,2": "minecraft:comparator[facing=north,mode=subtract]",
-      "3,0,2": "minecraft:redstone_wire[east=none,north=side,south=none,west=side]",
-      "1,0,3": "minecraft:redstone_wire[east=none,north=side,south=side,west=none]",
-      "2,0,3": "minecraft:redstone_wire[east=none,north=side,south=none,west=side]",
-      "1,0,4": "minecraft:repeater[facing=north]"
+      "3,0,2": "minecraft:comparator[facing=north,mode=subtract]",
+      "4,0,2": "minecraft:redstone_wire",
+      "1,0,3": "minecraft:redstone_wire",
+      "2,0,3": "minecraft:redstone_wire",
+      "3,0,3": "minecraft:redstone_wire",
+      "2,0,4": "minecraft:repeater[facing=north]"
     }
   },
   "MUX": {

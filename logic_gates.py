@@ -55,7 +55,7 @@ class LogicGates:
 
     @staticmethod
     def input_gate(id_str):
-        gate = Gate(1, 2, 1, 1, 1, 0, 0, [0])
+        gate = Gate(1, 2, 1, 1, 1, 1, 1, [0])
         gate.is_io = True
         gate.set_block(0, 0, 0, "minecraft:white_wool")
         
@@ -68,7 +68,7 @@ class LogicGates:
 
     @staticmethod
     def output_gate(id_str):
-        gate = Gate(1, 2, 1, 1, 1, 0, 0, [0])
+        gate = Gate(1, 2, 1, 1, 1, 1, 1, [0])
         gate.is_io = True
         gate.set_block(0, 0, 0, "minecraft:redstone_lamp")
         
@@ -100,7 +100,7 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 2, 3, inputs, 1, 1, 0, [0])
+        gate = Gate(width, 2, 3, inputs, 1, 1, 1, [0])
 
         for i in range(width):
             if i % 2 == 0:
@@ -118,7 +118,7 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 2, 2, inputs, 1, 1, 0, [0])
+        gate = Gate(width, 2, 2, inputs, 1, 1, 1, [0])
         
         for i in range(width):
             if i % 2 == 0:
@@ -133,7 +133,7 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 1, 2, inputs, 1, 1, 0, [0])
+        gate = Gate(width, 1, 2, inputs, 1, 1, 1, [0])
 
         for i in range(width):
             if i % 2 == 0:
@@ -147,7 +147,7 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 1, 3, inputs, 1, 1, 0, [0])
+        gate = Gate(width, 1, 3, inputs, 1, 1, 1, [0])
         
         for i in range(width):
             if i % 2 == 0:
