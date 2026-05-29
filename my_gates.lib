@@ -1,0 +1,57 @@
+library(my_simple_gates) {
+  cell(BUF) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output; function: "A"; }
+  }
+  cell(NOT) {
+    area: 1;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output; function: "A'"; }
+  }
+  cell(AND2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A*B)"; }
+  }
+  cell(NAND2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A*B)'"; }
+  }
+  cell(OR2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A+B)"; }
+  }
+  cell(NOR2) {
+    area: 2;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A+B)'"; }
+  }
+  cell(XOR2) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A^B)"; }
+  }
+  cell(XNOR2) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output; function: "(A^B)'"; }
+  }
+  cell(DECODER2_4) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y0) { direction: output; function: "(A' * B')"; }
+    pin(Y1) { direction: output; function: "(A' * B)"; }
+    pin(Y2) { direction: output; function: "(A * B')"; }
+    pin(Y3) { direction: output; function: "(A * B)"; }
+  }
+}

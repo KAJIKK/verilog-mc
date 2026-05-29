@@ -1,0 +1,9 @@
+# Ignore everything
+*
+# Whitelist Python files and specific config files
+!*.py
+!**/*.py
+!.gitignore
+!Makefile
+!*.lib
+!*.json
