@@ -123,7 +123,6 @@ class Net:
         
     def has_horizontal_conflict(self, other):
         # A conflict exists if there isn't at least a 1-block gap between the segments.
-        # This check ensures that self and other are separated by at least one X coordinate.
         return not (self.x_max < other.x_min - 1 or self.x_min > other.x_max + 1)
 
     def set_out_net(self, out_pin, original):
@@ -145,7 +144,7 @@ class Net:
         return out_col_x
         
     def track_z(self):
-        return 2 if self.track == 0 else (self.track * 3) + 2
+        return (self.track * 2) + 2
 
 class Node:
     def __init__(self, net_id):
@@ -247,7 +246,7 @@ class Channel:
 
     def gen_channel_circuit(self):
         from logic_gates import Circuit
-        length = 2 + (3 * len(self.tracks))
+        length = 2 + (len(self.tracks) * 2)
         height = 3
         width = 0
 
@@ -259,24 +258,20 @@ class Channel:
         circuit = Circuit(width, height, length)
         nets_done = []
 
-        # Adjacency Validation: Check for adjacent vertical wires across all nets
-        # (x, z) -> net_id
+        # (x, z) -> net_id for adjacency validation
         occupied_xz = {}
-        
         def check_adjacency(x, z, net_id):
             for dx in [-1, 1]:
                 if (x + dx, z) in occupied_xz:
                     other_net = occupied_xz[(x + dx, z)]
                     if other_net != net_id:
-                        raise Exception(f"SHORT DETECTED: Net {net_id} and Net {other_net} are adjacent at x={x}/{x+dx}, z={z}. This will cause a horizontal redstone short.")
+                        raise Exception(f"SHORT DETECTED: Net {net_id} and Net {other_net} are adjacent at x={x}/{x+dx}, z={z}.")
             occupied_xz[(x, z)] = net_id
 
         # Draw Straight Nets first (flat at y=0)
         for n in self.straight_nets:
-            # Validate vertical columns for straight nets
             for z in range(circuit.size_z):
                 check_adjacency(n.x_min, z, n.id)
-            
             self.wire_columns(circuit, n)
             self.repeat_nets(circuit, n)
             nets_done.append(n)
@@ -286,25 +281,20 @@ class Channel:
             for n in track:
                 if n in nets_done: continue
                 
-                # Validate track dropped positions and doglegs
-                z_track = 1 + (3 * n.track) + 1
+                z_track = (n.track * 2) + 2
                 dog_x = getattr(n, 'dogleg_x', n.x_max)
                 
-                # Dropped pins
-                for p in n.pins:
-                    check_adjacency(p.x, z_track, n.id)
-                # Dogleg
+                # Dropped positions validation
+                for p in n.pins: check_adjacency(p.x, z_track, n.id)
                 if n.outpath or (n.out_partner and not n.outpath):
                     check_adjacency(dog_x, z_track, n.id)
                 
-                # Validate vertical columns
+                # Vertical columns validation
                 for p in n.pins:
                     if p.top:
-                        for z in range(0, n.track_z() - 1):
-                            check_adjacency(p.x, z, n.id)
+                        for z in range(0, n.track_z() - 1): check_adjacency(p.x, z, n.id)
                     else:
-                        for z in range(n.track_z() + 2, circuit.size_z):
-                            check_adjacency(p.x, z, n.id)
+                        for z in range(n.track_z() + 2, circuit.size_z): check_adjacency(p.x, z, n.id)
                             
                 if n.outpath:
                     for z in range(n.track_z() + 2, n.out_partner.track_z() - 1):
@@ -313,7 +303,6 @@ class Channel:
                 self.place_track(circuit, n.track, n.x_min, n.x_max, n.pins, n)
                 nets_done.append(n)
 
-                # Restore missing dogleg repeaters and wires
                 if n.outpath:
                     circuit.set_block(n.dogleg_x, 0, n.track_z() + 1, "minecraft:repeater[facing=north]")
                 if n.out_partner and not n.outpath:
@@ -325,10 +314,9 @@ class Channel:
         return circuit
 
     def place_track(self, channel, track_number, xmin, xmax, pins, n):
-        z_min = 1 + (3 * track_number)
-        z_track = z_min + 1
+        z_track = (track_number * 2) + 2
+        z_min = z_track - 1
         
-        # Use the pre-calculated dogleg_x if it exists
         dogleg_x = getattr(n, 'dogleg_x', xmax)
         actual_xmax = max(xmax, dogleg_x)
         
@@ -346,48 +334,47 @@ class Channel:
         top_p = next((p for p in pins if p.top), None)
         
         def is_valid_pos(x_pos):
-            # A spot is invalid if it's a dropped block (is_pin) 
-            # or an elevated block next to a dropped one.
             for xi in [x_pos - 1, x_pos, x_pos + 1]:
-                if xi in pin_xs:
-                    return False
+                if xi in pin_xs: return False
             return True
 
-        repeater_map = {} # x -> facing
-        
+        repeater_map = {}
         if top_p:
-            # Right Side (+X direction)
-            last_r_x = top_p.x
             limit = 15
+            # Right Side
+            last_r_x = top_p.x
             while last_r_x + limit <= actual_xmax:
                 target_x = last_r_x + limit
                 found = False
                 for cand_x in range(target_x, last_r_x, -1):
                     if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "west"
+                        repeater_map[cand_x] = "east"
                         last_r_x = cand_x
                         found = True
                         break
-                if not found:
-                    raise Exception(f"Net {self.id}: Cannot place horizontal repeater on right side (too many pins/drops).")
-
-            # Left Side (-X direction)
+                if not found: raise Exception(f"Net {self.id}: Cannot place horizontal repeater.")
+            # Left Side
             last_r_x = top_p.x
             while last_r_x - limit >= xmin:
                 target_x = last_r_x - limit
                 found = False
                 for cand_x in range(target_x, last_r_x):
                     if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "east"
+                        repeater_map[cand_x] = "west"
                         last_r_x = cand_x
                         found = True
                         break
-                if not found:
-                    raise Exception(f"Net {self.id}: Cannot place horizontal repeater on left side (too many pins/drops).")
+                if not found: raise Exception(f"Net {self.id}: Cannot place horizontal repeater.")
 
-        # Color code horizontal tracks
+        is_short_bridge = (bridge_length <= 4)
         for x in range(xmin, actual_xmax + 1):
-            if x in top_pin_xs:
+            if is_short_bridge:
+                # Flat bridge at ground level (y=0)
+                if x in repeater_map:
+                    channel.set_block(x, 0, z_track, f"minecraft:repeater[facing={repeater_map[x]}]")
+                else:
+                    channel.set_block(x, 0, z_track, "minecraft:redstone_wire")
+            elif x in top_pin_xs:
                 channel.set_block(x, 0, z_track, "minecraft:cyan_wool")
                 channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
             elif x in bot_pin_xs:
@@ -404,39 +391,35 @@ class Channel:
                     channel.set_block(x, 2, z_track, "minecraft:redstone_wire")
             
         for p in pins:
-            if p.top:
-                # All pin entries face NORTH as requested
-                channel.set_block(p.x, 0, z_min, "minecraft:repeater[facing=north]")
-            else:
-                # All pin entries face NORTH as requested
-                channel.set_block(p.x, 0, z_track + 1, "minecraft:repeater[facing=north]")
+            z_pin = (z_track - 1) if p.top else (z_track + 1)
+            channel.set_block(p.x, 0, z_pin, "minecraft:repeater[facing=north]")
 
     def wire_columns(self, channel, n):
-        if n.track == -2: # Straight optimization
-            for z in range(channel.size_z):
-                channel.set_block(n.x_min, 0, z, "minecraft:redstone_wire")
+        def set_wire(x, y, z):
+            existing = channel.blocks.get((x, y, z))
+            if not existing or "redstone_wire" in existing:
+                channel.set_block(x, y, z, "minecraft:redstone_wire")
+
+        if n.track == -2:
+            for z in range(channel.size_z): set_wire(n.x_min, 0, z)
             return
 
         for p in n.pins:
             if p.top:
-                for z in range(0, n.track_z() - 1):
-                    channel.set_block(p.x, 0, z, "minecraft:redstone_wire")
+                for z in range(0, n.track_z() - 1): set_wire(p.x, 0, z)
             else:
-                for z in range(n.track_z() + 2, channel.size_z):
-                    channel.set_block(p.x, 0, z, "minecraft:redstone_wire")
+                for z in range(n.track_z() + 2, channel.size_z): set_wire(p.x, 0, z)
                     
         if n.outpath:
-            # Use pre-calculated dogleg_x for the shifted vertical column
             dog_x = getattr(n, 'dogleg_x', n.x_max)
             for z in range(n.track_z() + 2, n.out_partner.track_z() - 1):
-                channel.set_block(dog_x, 0, z, "minecraft:redstone_wire")
+                set_wire(dog_x, 0, z)
 
     def repeat_nets(self, channel, n):
-        if n.track == -2: # Straight optimization
+        if n.track == -2:
              for z in range(14, channel.size_z, 14):
                  channel.set_block(n.x_min, 0, z, "minecraft:repeater[facing=north]")
              return
-
         for p in n.pins:
             if p.top:
                 if n.track_z() > 14:
@@ -446,7 +429,6 @@ class Channel:
                 if channel.size_z - n.track_z() > 14:
                     for z in range(n.track_z() + 3, channel.size_z, 14):
                         channel.set_block(p.x, 0, z, "minecraft:repeater[facing=north]")
-
         if n.outpath:
             if n.out_partner.track_z() - n.track_z() > 14:
                 for z in range(n.track_z() + 3, n.out_partner.track_z() - 2, 13):
@@ -460,38 +442,29 @@ class Channel:
         return x_max
         
     def size_z(self):
-        return 2 + (len(self.tracks) * 3)
+        return 2 + (len(self.tracks) * 2)
 
 class Router:
     @staticmethod
     def initialize_pins(top_vertices, top_gates, bottom_vertices, bottom_gates, gate_spacing=1):
         pin_map = {}
         pins_array = PinsArray()
-        
         top_offset = 0
         for i, v in enumerate(top_vertices):
             g = top_gates[i]
             gp = GatePins(g, v, top_offset, True)
             pin_map[v] = gp
             top_offset += g.size_x + gate_spacing
-            
         bottom_offset = 0
         for i, v in enumerate(bottom_vertices):
             g = bottom_gates[i]
             gp = GatePins(g, v, bottom_offset, False)
-            if v.name == '$abc$108$auto$blifparse.cc:397:parse_blif$110':
-                print(f"DEBUG {v.name}: g.num_inputs={g.num_inputs}, len(gp.pins)={len(gp.pins)}")
             pin_map[v] = gp
             bottom_offset += g.size_x + gate_spacing
-            
         for v in top_vertices:
-            for p in pin_map[v].pins:
-                pins_array.add_pin(p, True)
-                
+            for p in pin_map[v].pins: pins_array.add_pin(p, True)
         for v in bottom_vertices:
-            for p in pin_map[v].pins:
-                pins_array.add_pin(p, False)
-                
+            for p in pin_map[v].pins: pins_array.add_pin(p, False)
         return pin_map, pins_array
 
     @staticmethod
@@ -503,73 +476,54 @@ class Router:
             while gate.has_next_pin():
                 next_pin = gate.get_next_pin(v)
                 if next_pin.is_empty or next_pin.net_id != -1: continue
-                
                 net = Net()
                 nets[net.id] = net
                 net.add_pin(next_pin, False)
-                
                 for next_vertex in v.next:
                     if next_vertex in pin_map:
                         net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
-                        
         for v in bottom_vertices:
             gate = pin_map[v]
             while gate.has_next_pin():
                 next_pin = gate.get_next_pin(v)
                 if next_pin.is_empty or next_pin.net_id != -1: continue
-                
                 net = Net()
                 nets[net.id] = net
                 net.add_pin(next_pin, False)
-                
                 for next_vertex in v.next:
                     if next_vertex in pin_map:
                         net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
-                        
         return nets
 
     @staticmethod
     def place_nets(nets, pin_pairs):
         vcg = VCG(pin_pairs, nets)
-        
-        # New Step: Calculate Dogleg X-coordinates and update x_max BEFORE routing
         all_pin_xs = set()
         for pair in pin_pairs.pairs:
             if not pair.top.is_empty: all_pin_xs.add(pair.top.x)
             if not pair.bot.is_empty: all_pin_xs.add(pair.bot.x)
-            
         for net_id, net in nets.items():
             if net.outpath and not hasattr(net, 'dogleg_x'):
                 cand_x = net.x_max + 1
                 if cand_x % 2 != 0: cand_x += 1
-                while cand_x in all_pin_xs:
-                    cand_x += 2
+                while cand_x in all_pin_xs: cand_x += 2
                 net.dogleg_x = cand_x
                 net.out_partner.dogleg_x = cand_x
-                
                 net.x_max = max(net.x_max, net.dogleg_x)
                 net.out_partner.x_max = max(net.out_partner.x_max, net.dogleg_x)
-
         channel = Channel(pin_pairs)
-        
-        # Step 1: Detect Straight Nets (Single column, no vertical constraints)
         for net_id, net in list(nets.items()):
             if net.x_min == net.x_max and not net.outpath:
-                # If it's a single-column net, check if it's involved in any VCG constraints
-                # (i.e., no other net is above or below it in this column)
                 is_independent = True
                 for other_id, node in vcg.nodes.items():
                     if other_id == net_id: continue
                     if net_id in [e.net_id for e in node.edges]:
                         is_independent = False
                         break
-                
                 if is_independent and not vcg.nodes[net_id].edges:
                     channel.straight_nets.append(net)
-                    net.track = -2 # Special marker for straight wires
+                    net.track = -2
                     vcg.routed(net_id)
-        
-        # Step 2: Route the remaining nets using tracks
         while not vcg.done():
             for pair in pin_pairs.pairs:
                 if not pair.top.is_empty and vcg.can_route(pair.top.net_id):
