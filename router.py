@@ -310,6 +310,48 @@ class Channel:
 
                 self.wire_columns(circuit, n)
                 self.repeat_nets(circuit, n)
+
+        # Identify contiguous segments of light_gray_wool at y=1 (sub-bridges)
+        light_gray_blocks = [(x, z) for (x, y, z), b in circuit.blocks.items() if y == 1 and b == "minecraft:light_gray_wool"]
+        segments_by_z = {} # z -> list of [xmin, xmax]
+        for x, z in sorted(light_gray_blocks, key=lambda p: (p[1], p[0])):
+            if z not in segments_by_z: segments_by_z[z] = [[x, x]]
+            else:
+                last = segments_by_z[z][-1]
+                if x == last[1] + 1: last[1] = x
+                else: segments_by_z[z].append([x, x])
+
+        # Decide which sub-bridge segments to lower
+        lowered_segments = set() # (xmin, xmax, z)
+        all_segments = set() # (xmin, xmax, z)
+        for z, segs in segments_by_z.items():
+            for xmin, xmax in segs:
+                all_segments.add((xmin, xmax, z))
+                if all(not circuit.blocks.get((x, 0, z)) for x in range(xmin, xmax + 1)):
+                    lowered_segments.add((xmin, xmax, z))
+
+        # Decide which special blocks (pins/doglegs) to lower
+        special_blocks = {(x, z) for (x, y, z), b in circuit.blocks.items() if y == 0 and b in ["minecraft:cyan_wool", "minecraft:pink_wool", "minecraft:yellow_wool"]}
+        lowered_specials = set()
+        for sx, sz in special_blocks:
+            # A special block is lowered if ALL segments touching it are also being lowered
+            touching_segments = [s for s in all_segments if s[2] == sz and (s[0] == sx + 1 or s[1] == sx - 1)]
+            if touching_segments and all(s in lowered_segments for s in touching_segments):
+                lowered_specials.add((sx, sz))
+
+        # Execute lowering for segments
+        for xmin, xmax, z in lowered_segments:
+            for x in range(xmin, xmax + 1):
+                b = circuit.blocks.get((x, 2, z), "minecraft:redstone_wire")
+                circuit.set_block(x, 0, z, b)
+                if (x, 1, z) in circuit.blocks: del circuit.blocks[(x, 1, z)]
+                if (x, 2, z) in circuit.blocks: del circuit.blocks[(x, 2, z)]
+        
+        # Execute lowering for special blocks
+        for sx, sz in lowered_specials:
+            b = circuit.blocks.get((sx, 1, sz), "minecraft:redstone_wire")
+            circuit.set_block(sx, 0, sz, b)
+            if (sx, 1, sz) in circuit.blocks: del circuit.blocks[(sx, 1, sz)]
                 
         return circuit
 
@@ -348,7 +390,7 @@ class Channel:
                 found = False
                 for cand_x in range(target_x, last_r_x, -1):
                     if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "east"
+                        repeater_map[cand_x] = "west" # retaded minecraft logic: repeater faces the direction it receives input from, not the direction it outputs to. Do not change
                         last_r_x = cand_x
                         found = True
                         break
@@ -360,7 +402,7 @@ class Channel:
                 found = False
                 for cand_x in range(target_x, last_r_x):
                     if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "west"
+                        repeater_map[cand_x] = "east" # retaded minecraft logic: repeater faces the direction it receives input from, not the direction it outputs to. Do not change
                         last_r_x = cand_x
                         found = True
                         break

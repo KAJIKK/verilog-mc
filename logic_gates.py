@@ -60,11 +60,11 @@ class LogicGates:
         gate.set_block(0, 0, 0, "minecraft:white_wool")
         
         # New 1.20+ front_text format
-        msg = f"'[{{\"text\":\"{id_str}\"}}]'"
-        empty = "'[{\"text\":\"\"}]'"
-        sign_nbt = f"{{front_text:{{messages:[{empty},{msg},{empty},{empty}]}}}}"        
+        sign_nbt = f"{{front_text:{{messages:['','{id_str}','','']}}}}"
         gate.set_block(0, 1, 0, f"minecraft:oak_sign[rotation=8]{sign_nbt}")
         return gate
+    
+    # /setblock ~ ~ ~ oak_sign[rotation=4]{front_text:{messages:['a','b','c','d']}}
 
     @staticmethod
     def output_gate(id_str):
@@ -72,9 +72,7 @@ class LogicGates:
         gate.is_io = True
         gate.set_block(0, 0, 0, "minecraft:redstone_lamp")
         
-        msg = f"'[{{\"text\":\"{id_str}\"}}]'"
-        empty = "'[{\"text\":\"\"}]'"
-        sign_nbt = f"{{front_text:{{messages:[{empty},{msg},{empty},{empty}]}}}}"        
+        sign_nbt = f"{{front_text:{{messages:['','{id_str}','','']}}}}"
         gate.set_block(0, 1, 0, f"minecraft:oak_sign[rotation=0]{sign_nbt}")
         return gate
 
