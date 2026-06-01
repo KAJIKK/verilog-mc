@@ -36,7 +36,11 @@ viz: synth
 	yosys -p "read_liberty -lib $(LIB_FILE); \
 	          read_json $(OUTPUT_JSON); \
 	          splitnets -ports; \
-	          show -format svg -prefix $(OUTPUT_PREFIX)"
+	          show -format dot -prefix $(OUTPUT_PREFIX)"
+	# Add labels to wires in the DOT file using the node names
+	sed -i 's/\(n[0-9]\+\):e -> \(.*\)label=""/\1:e -> \2label="\1"/g' $(OUTPUT_PREFIX).dot
+	dot -Tsvg $(OUTPUT_PREFIX).dot -o $(OUTPUT_PREFIX).svg
+	@echo "Generated $(OUTPUT_PREFIX).svg with labels"
 
 # Clean target
 clean:

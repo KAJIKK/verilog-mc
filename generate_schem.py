@@ -22,6 +22,10 @@ def generate_circuit_schematic(json_filepath, filename):
     print("Assembling final circuit...")
     circuit = ic.gen_circuit()
     
+    # Save debug SVG
+    svg_filename = f"{filename}_debug.svg"
+    ic.save_debug_svg(svg_filename)
+    
     # Report Statistics
     stats = ic.get_statistics()
     print("\n" + "="*30)

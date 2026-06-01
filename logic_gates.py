@@ -54,25 +54,28 @@ class LogicGates:
         return gate
 
     @staticmethod
-    def input_gate(id_str):
+    def input_gate(id_str, net_id=None):
         gate = Gate(1, 2, 1, 1, 1, 1, 1, [0])
         gate.is_io = True
         gate.set_block(0, 0, 0, "minecraft:white_wool")
         
         # New 1.20+ front_text format
-        sign_nbt = f"{{front_text:{{messages:['','{id_str}','','']}}}}"
+        # Line 2: Name, Line 3: Net ID (if available)
+        net_str = f"Net: {net_id}" if net_id is not None else ""
+        sign_nbt = f"{{front_text:{{messages:['','{id_str}','{net_str}','']}}}}"
         gate.set_block(0, 1, 0, f"minecraft:oak_sign[rotation=8]{sign_nbt}")
         return gate
     
     # /setblock ~ ~ ~ oak_sign[rotation=4]{front_text:{messages:['a','b','c','d']}}
 
     @staticmethod
-    def output_gate(id_str):
+    def output_gate(id_str, net_id=None):
         gate = Gate(1, 2, 1, 1, 1, 1, 1, [0])
         gate.is_io = True
         gate.set_block(0, 0, 0, "minecraft:redstone_lamp")
         
-        sign_nbt = f"{{front_text:{{messages:['','{id_str}','','']}}}}"
+        net_str = f"Net: {net_id}" if net_id is not None else ""
+        sign_nbt = f"{{front_text:{{messages:['','{id_str}','{net_str}','']}}}}"
         gate.set_block(0, 1, 0, f"minecraft:oak_sign[rotation=0]{sign_nbt}")
         return gate
 

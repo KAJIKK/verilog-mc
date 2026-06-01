@@ -97,10 +97,8 @@ class MuxPins(GatePins):
         return super().get_next_pin(v)
 
 class Net:
-    num_nets = 0
-    def __init__(self, x_min=float('inf'), x_max=-1):
-        self.id = Net.num_nets
-        Net.num_nets += 1
+    def __init__(self, yosys_id, x_min=float('inf'), x_max=-1):
+        self.id = yosys_id
         self.track = -1
         self.pins = []
         self.top_pin = None
@@ -144,7 +142,7 @@ class Net:
         return out_col_x
         
     def track_z(self):
-        return (self.track * 2) + 2
+        return (self.track * 2) + 1
 
 class Node:
     def __init__(self, net_id):
@@ -173,7 +171,9 @@ class VCG:
                     self.nodes[pair.bot.net_id].edges.append(self.nodes[pair.top.net_id])
                     self.edges_done.append((pair.top.net_id, pair.bot.net_id))
                 else:
-                    out_net = Net()
+                    # Create unique dogleg ID based on parent net ID
+                    dogleg_id = pair.top.net_id + 50000 
+                    out_net = Net(dogleg_id)
                     nets[out_net.id] = out_net
                     out_partner = nets[pair.top.net_id]
                     out_net.set_out_net(pair.top, out_partner)
@@ -246,7 +246,7 @@ class Channel:
 
     def gen_channel_circuit(self):
         from logic_gates import Circuit
-        length = 2 + (len(self.tracks) * 2)
+        length = (len(self.tracks) * 2) + 1
         height = 3
         width = 0
 
@@ -281,7 +281,7 @@ class Channel:
             for n in track:
                 if n in nets_done: continue
                 
-                z_track = (n.track * 2) + 2
+                z_track = (n.track * 2) + 1
                 dog_x = getattr(n, 'dogleg_x', n.x_max)
                 
                 # Dropped positions validation
@@ -356,7 +356,7 @@ class Channel:
         return circuit
 
     def place_track(self, channel, track_number, xmin, xmax, pins, n):
-        z_track = (track_number * 2) + 2
+        z_track = (track_number * 2) + 1
         z_min = z_track - 1
         
         dogleg_x = getattr(n, 'dogleg_x', xmax)
@@ -380,33 +380,46 @@ class Channel:
                 if xi in pin_xs: return False
             return True
 
+        # Identify the signal source for horizontal repeater placement
+        source_x = xmin
+        if n.outpath:
+            # Signal for doglegs enters at the dogleg_x from the partner track
+            source_x = getattr(n, 'dogleg_x', xmin)
+        elif top_p:
+            source_x = top_p.x
+        elif pins:
+            source_x = pins[0].x
+
         repeater_map = {}
-        if top_p:
-            limit = 15
-            # Right Side
-            last_r_x = top_p.x
-            while last_r_x + limit <= actual_xmax:
-                target_x = last_r_x + limit
-                found = False
-                for cand_x in range(target_x, last_r_x, -1):
-                    if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "west" # retaded minecraft logic: repeater faces the direction it receives input from, not the direction it outputs to. Do not change
-                        last_r_x = cand_x
-                        found = True
-                        break
-                if not found: raise Exception(f"Net {self.id}: Cannot place horizontal repeater.")
-            # Left Side
-            last_r_x = top_p.x
-            while last_r_x - limit >= xmin:
-                target_x = last_r_x - limit
-                found = False
-                for cand_x in range(target_x, last_r_x):
-                    if is_valid_pos(cand_x):
-                        repeater_map[cand_x] = "east" # retaded minecraft logic: repeater faces the direction it receives input from, not the direction it outputs to. Do not change
-                        last_r_x = cand_x
-                        found = True
-                        break
-                if not found: raise Exception(f"Net {self.id}: Cannot place horizontal repeater.")
+        limit = 14 # Use 14 for safety
+        
+        # Right Side from source
+        last_r_x = source_x
+        while last_r_x + limit <= actual_xmax:
+            target_x = last_r_x + limit
+            found = False
+            for cand_x in range(target_x, last_r_x, -1):
+                if is_valid_pos(cand_x):
+                    # Signal flows East (positive X), so repeater faces West to receive input from West
+                    repeater_map[cand_x] = "west" 
+                    last_r_x = cand_x
+                    found = True
+                    break
+            if not found: raise Exception(f"Net {n.id}: Cannot place horizontal repeater on right side.")
+            
+        # Left Side from source
+        last_l_x = source_x
+        while last_l_x - limit >= xmin:
+            target_x = last_l_x - limit
+            found = False
+            for cand_x in range(target_x, last_l_x):
+                if is_valid_pos(cand_x):
+                    # Signal flows West (negative X), so repeater faces East to receive input from East
+                    repeater_map[cand_x] = "east"
+                    last_l_x = cand_x
+                    found = True
+                    break
+            if not found: raise Exception(f"Net {n.id}: Cannot place horizontal repeater on left side.")
 
         is_short_bridge = (bridge_length <= 4)
         for x in range(xmin, actual_xmax + 1):
@@ -484,25 +497,28 @@ class Channel:
         return x_max
         
     def size_z(self):
-        return 2 + (len(self.tracks) * 2)
+        if not self.tracks: return 0
+        return (len(self.tracks) * 2) + 1
 
 class Router:
     @staticmethod
     def initialize_pins(top_vertices, top_gates, bottom_vertices, bottom_gates, gate_spacing=1):
         pin_map = {}
         pins_array = PinsArray()
-        top_offset = 0
+        
         for i, v in enumerate(top_vertices):
             g = top_gates[i]
-            gp = GatePins(g, v, top_offset, True)
+            # Use g.x_offset if available, otherwise fallback to sequential (should not happen with new logic)
+            offset = getattr(g, 'x_offset', 0) 
+            gp = GatePins(g, v, offset, True)
             pin_map[v] = gp
-            top_offset += g.size_x + gate_spacing
-        bottom_offset = 0
+            
         for i, v in enumerate(bottom_vertices):
             g = bottom_gates[i]
-            gp = GatePins(g, v, bottom_offset, False)
+            offset = getattr(g, 'x_offset', 0)
+            gp = GatePins(g, v, offset, False)
             pin_map[v] = gp
-            bottom_offset += g.size_x + gate_spacing
+            
         for v in top_vertices:
             for p in pin_map[v].pins: pins_array.add_pin(p, True)
         for v in bottom_vertices:
@@ -511,48 +527,93 @@ class Router:
 
     @staticmethod
     def initialize_nets(top_vertices, bottom_vertices, pin_map):
-        Net.num_nets = 0
         nets = {}
+        # Map Yosys bit IDs to Net objects
         for v in top_vertices:
             gate = pin_map[v]
+            # Use the bit ID stored in the vertex from netlist_parser.py
+            bits = getattr(v, 'bits', [])
+            bit_id = bits[0] if bits and isinstance(bits[0], int) else -1
+            
             while gate.has_next_pin():
                 next_pin = gate.get_next_pin(v)
                 if next_pin.is_empty or next_pin.net_id != -1: continue
-                net = Net()
-                nets[net.id] = net
+                
+                # If we don't have a valid bit_id, fallback to something unique
+                n_id = bit_id if bit_id != -1 else (10000 + len(nets))
+                if n_id not in nets:
+                    nets[n_id] = Net(n_id)
+                net = nets[n_id]
                 net.add_pin(next_pin, False)
                 for next_vertex in v.next:
                     if next_vertex in pin_map:
                         net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
+                        
         for v in bottom_vertices:
-            gate = pin_map[v]
-            while gate.has_next_pin():
-                next_pin = gate.get_next_pin(v)
-                if next_pin.is_empty or next_pin.net_id != -1: continue
-                net = Net()
-                nets[net.id] = net
-                net.add_pin(next_pin, False)
-                for next_vertex in v.next:
-                    if next_vertex in pin_map:
-                        net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
+            if v in pin_map:
+                gate = pin_map[v]
+                bits = getattr(v, 'bits', [])
+                bit_id = bits[0] if bits and isinstance(bits[0], int) else -1
+                
+                while gate.has_next_pin():
+                    next_pin = gate.get_next_pin(v)
+                    if next_pin.is_empty or next_pin.net_id != -1: continue
+                    
+                    n_id = bit_id if bit_id != -1 else (20000 + len(nets))
+                    if n_id not in nets:
+                        nets[n_id] = Net(n_id)
+                    net = nets[n_id]
+                    net.add_pin(next_pin, False)
+                    for next_vertex in v.next:
+                        if next_vertex in pin_map:
+                            net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
         return nets
 
     @staticmethod
-    def place_nets(nets, pin_pairs):
+    def place_nets(nets, pin_pairs, top_gates, bottom_gates, gate_spacing=1):
         vcg = VCG(pin_pairs, nets)
-        all_pin_xs = set()
+        
+        # Accurately track ALL occupied X-coordinates
+        occupied_xs = set()
+        
+        for g in top_gates:
+            off = getattr(g, 'x_offset', 0)
+            for x in range(off, off + g.size_x):
+                occupied_xs.add(x)
+            
+        for g in bottom_gates:
+            off = getattr(g, 'x_offset', 0)
+            for x in range(off, off + g.size_x):
+                occupied_xs.add(x)
+            
+        # Also track any pins that might be outside gate bodies (though usually they are inside)
         for pair in pin_pairs.pairs:
-            if not pair.top.is_empty: all_pin_xs.add(pair.top.x)
-            if not pair.bot.is_empty: all_pin_xs.add(pair.bot.x)
+            if not pair.top.is_empty: occupied_xs.add(pair.top.x)
+            if not pair.bot.is_empty: occupied_xs.add(pair.bot.x)
+        
         for net_id, net in nets.items():
             if net.outpath and not hasattr(net, 'dogleg_x'):
-                cand_x = net.x_max + 1
-                if cand_x % 2 != 0: cand_x += 1
-                while cand_x in all_pin_xs: cand_x += 2
-                net.dogleg_x = cand_x
-                net.out_partner.dogleg_x = cand_x
+                # Search for the best available even x
+                best_x = -1
+                min_dist = float('inf')
+                
+                # Search range: from 0 up to current max + a generous buffer
+                max_occ = max(occupied_xs) if occupied_xs else 0
+                for cand_x in range(0, max_occ + 10, 2):
+                    if cand_x not in occupied_xs:
+                        # Distance to the net's bounding box
+                        dist = max(0, cand_x - net.x_max, net.x_min - cand_x)
+                        
+                        # Tie-break: prefer smaller x to keep the circuit compact
+                        if dist < min_dist or (dist == min_dist and cand_x < best_x):
+                            min_dist = dist
+                            best_x = cand_x
+                
+                net.dogleg_x = best_x
+                net.out_partner.dogleg_x = best_x
                 net.x_max = max(net.x_max, net.dogleg_x)
                 net.out_partner.x_max = max(net.out_partner.x_max, net.dogleg_x)
+                occupied_xs.add(best_x)
         channel = Channel(pin_pairs)
         for net_id, net in list(nets.items()):
             if net.x_min == net.x_max and not net.outpath:
