@@ -402,22 +402,38 @@ class IntermediateCircuit:
             size_z += c.size_z() + 1
             
         circuit = Circuit(size_x, size_y, size_z)
+        sources = [] # (pos, power, direction)
+        gate_repeaters = set() # (x, y, z)
         
         z_offset = 0
         for i in range(len(self.gate_layers)):
-            for g in self.gate_layers[i]:
-                # insert circuit
+            for j, g in enumerate(self.gate_layers[i]):
+                v = self.vertex_layers[i][j]
+                # Insert gate blocks
                 for (lx, ly, lz), b in g.blocks.items():
-                    circuit.set_block(g.x_offset + lx, 0 + ly, z_offset + lz, b)
-                    
-                if g.size_z - 1 < layers_size_z[i]:
+                    px, py, pz = g.x_offset + lx, 0 + ly, z_offset + lz
+                    circuit.set_block(px, py, pz, b)
+                    if "repeater" in b:
+                        gate_repeaters.add((px, py, pz))
+
+                # If this gate is a source of power (not an output, not a relay bridge)
+                # find its output point to start tracking wire runs
+                ftype = getattr(v, 'func_type', '')
+                if v.type == VertexType.INPUT or (v.type == VertexType.FUNCTION and ftype != 'RELAY'):
+                    # Source point is at the end of the gate's output pin
+                    out_offsets = getattr(g, 'output_offsets', None) or [0]
+                    # We assume north-facing gates (output is at z = g.size_z - 1)
+                    # We track the first block of the subsequent wire as the source
+                    source_x = g.x_offset + out_offsets[0]
+                    source_z = z_offset + g.size_z
+                    sources.append(((source_x, 0, source_z), 15, "south"))
+
+                # Extend wire through the layer gap (padding)
+                if g.size_z < layers_size_z[i]:
+                    out_offsets = getattr(g, 'output_offsets', None) or [0]
+                    wire_x = g.x_offset + out_offsets[0]
                     for z in range(g.size_z, layers_size_z[i]):
-                        # Place a repeater every 14 blocks or at the very end
-                        dist_from_gate = z - g.size_z + 1
-                        if z == layers_size_z[i] - 1 or dist_from_gate % 14 == 0:
-                            circuit.set_block(g.x_offset, 0, z_offset + z, "minecraft:repeater[facing=north]")
-                        else:
-                            circuit.set_block(g.x_offset, 0, z_offset + z, "minecraft:redstone_wire")
+                        circuit.set_block(wire_x, 0, z_offset + z, "minecraft:redstone_wire")
                             
             z_offset += layers_size_z[i]
             
@@ -428,4 +444,4 @@ class IntermediateCircuit:
                     circuit.set_block(cx, cy, z_offset + cz, b)
                 z_offset += c.size_z()
                 
-        return circuit
+        return circuit, sources, gate_repeaters

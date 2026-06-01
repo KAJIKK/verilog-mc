@@ -119,7 +119,7 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 2, 2, inputs, 1, 1, 1, [0])
+        gate = Gate(width, 2, 3, inputs, 1, 1, 1, [0])
         
         for i in range(width):
             if i % 2 == 0:
@@ -127,6 +127,8 @@ class LogicGates:
                 gate.set_block(i, 1, 0, "minecraft:redstone_torch")
             gate.set_block(i, 0, 1, "minecraft:white_wool")
             gate.set_block(i, 1, 1, "minecraft:redstone_wire")
+        gate.set_block(0, 0, 2, "minecraft:repeater[facing=north]")
+
         return gate
 
     @staticmethod
@@ -134,12 +136,13 @@ class LogicGates:
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")
         width = 1 if inputs == 1 else (inputs * 2) - 1
-        gate = Gate(width, 1, 2, inputs, 1, 1, 1, [0])
+        gate = Gate(width, 1, 3, inputs, 1, 1, 1, [0])
 
         for i in range(width):
             if i % 2 == 0:
                 gate.set_block(i, 0, 0, "minecraft:repeater[facing=north]")
             gate.set_block(i, 0, 1, "minecraft:redstone_wire")
+        gate.set_block(0, 0, 2, "minecraft:repeater[facing=north]")
         return gate
 
     @staticmethod

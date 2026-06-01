@@ -304,9 +304,9 @@ class Channel:
                 nets_done.append(n)
 
                 if n.outpath:
-                    circuit.set_block(n.dogleg_x, 0, n.track_z() + 1, "minecraft:repeater[facing=north]")
+                    circuit.set_block(n.dogleg_x, 0, n.track_z() + 1, "minecraft:redstone_wire")
                 if n.out_partner and not n.outpath:
-                    circuit.set_block(n.dogleg_x, 0, n.track_z() - 1, "minecraft:repeater[facing=north]")
+                    circuit.set_block(n.dogleg_x, 0, n.track_z() - 1, "minecraft:redstone_wire")
 
                 self.wire_columns(circuit, n)
                 self.repeat_nets(circuit, n)
@@ -373,62 +373,11 @@ class Channel:
         bridge_length = actual_xmax - xmin + 1
         bridge_color = "minecraft:red_wool" if bridge_length <= 4 else "minecraft:light_gray_wool"
         
-        top_p = next((p for p in pins if p.top), None)
-        
-        def is_valid_pos(x_pos):
-            for xi in [x_pos - 1, x_pos, x_pos + 1]:
-                if xi in pin_xs: return False
-            return True
-
-        # Identify the signal source for horizontal repeater placement
-        source_x = xmin
-        if n.outpath:
-            # Signal for doglegs enters at the dogleg_x from the partner track
-            source_x = getattr(n, 'dogleg_x', xmin)
-        elif top_p:
-            source_x = top_p.x
-        elif pins:
-            source_x = pins[0].x
-
-        repeater_map = {}
-        limit = 14 # Use 14 for safety
-        
-        # Right Side from source
-        last_r_x = source_x
-        while last_r_x + limit <= actual_xmax:
-            target_x = last_r_x + limit
-            found = False
-            for cand_x in range(target_x, last_r_x, -1):
-                if is_valid_pos(cand_x):
-                    # Signal flows East (positive X), so repeater faces West to receive input from West
-                    repeater_map[cand_x] = "west" 
-                    last_r_x = cand_x
-                    found = True
-                    break
-            if not found: raise Exception(f"Net {n.id}: Cannot place horizontal repeater on right side.")
-            
-        # Left Side from source
-        last_l_x = source_x
-        while last_l_x - limit >= xmin:
-            target_x = last_l_x - limit
-            found = False
-            for cand_x in range(target_x, last_l_x):
-                if is_valid_pos(cand_x):
-                    # Signal flows West (negative X), so repeater faces East to receive input from East
-                    repeater_map[cand_x] = "east"
-                    last_l_x = cand_x
-                    found = True
-                    break
-            if not found: raise Exception(f"Net {n.id}: Cannot place horizontal repeater on left side.")
-
         is_short_bridge = (bridge_length <= 4)
         for x in range(xmin, actual_xmax + 1):
             if is_short_bridge:
                 # Flat bridge at ground level (y=0)
-                if x in repeater_map:
-                    channel.set_block(x, 0, z_track, f"minecraft:repeater[facing={repeater_map[x]}]")
-                else:
-                    channel.set_block(x, 0, z_track, "minecraft:redstone_wire")
+                channel.set_block(x, 0, z_track, "minecraft:redstone_wire")
             elif x in top_pin_xs:
                 channel.set_block(x, 0, z_track, "minecraft:cyan_wool")
                 channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
@@ -440,14 +389,11 @@ class Channel:
                 channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
             else:
                 channel.set_block(x, 1, z_track, bridge_color)
-                if x in repeater_map:
-                    channel.set_block(x, 2, z_track, f"minecraft:repeater[facing={repeater_map[x]}]")
-                else:
-                    channel.set_block(x, 2, z_track, "minecraft:redstone_wire")
+                channel.set_block(x, 2, z_track, "minecraft:redstone_wire")
             
         for p in pins:
             z_pin = (z_track - 1) if p.top else (z_track + 1)
-            channel.set_block(p.x, 0, z_pin, "minecraft:repeater[facing=north]")
+            channel.set_block(p.x, 0, z_pin, "minecraft:redstone_wire")
 
     def wire_columns(self, channel, n):
         def set_wire(x, y, z):
@@ -471,23 +417,8 @@ class Channel:
                 set_wire(dog_x, 0, z)
 
     def repeat_nets(self, channel, n):
-        if n.track == -2:
-             for z in range(14, channel.size_z, 14):
-                 channel.set_block(n.x_min, 0, z, "minecraft:repeater[facing=north]")
-             return
-        for p in n.pins:
-            if p.top:
-                if n.track_z() > 14:
-                    for z in range(n.track_z() - 14, -1, -14):
-                        channel.set_block(p.x, 0, z, "minecraft:repeater[facing=north]")
-            else:
-                if channel.size_z - n.track_z() > 14:
-                    for z in range(n.track_z() + 3, channel.size_z, 14):
-                        channel.set_block(p.x, 0, z, "minecraft:repeater[facing=north]")
-        if n.outpath:
-            if n.out_partner.track_z() - n.track_z() > 14:
-                for z in range(n.track_z() + 3, n.out_partner.track_z() - 2, 13):
-                    channel.set_block(n.x_max, 0, z, "minecraft:repeater[facing=north]")
+        # Repeaters are now handled by the postprocessor.
+        pass
             
     def size_x(self):
         x_max = 0
