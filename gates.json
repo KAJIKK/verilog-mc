@@ -46,34 +46,40 @@
     }
   },
   "MUX": {
-    "size": [5, 2, 6],
+    "size": [5, 3, 4],
     "num_inputs": 3,
     "num_outputs": 1,
-    "input_offsets": [0, 2, 4],
-    "output_offsets": [0],
+    "input_offsets": {
+      "S": 0,
+      "A": 2,
+      "B": 4
+    },
+    "output_offsets": {
+      "Y": 4
+    },
     "blocks": {
-      "0,0,0": "minecraft:white_wool",
-      "0,0,1": "minecraft:white_wool",
-      "0,0,2": "minecraft:white_wool",
-      "0,0,3": "minecraft:redstone_wall_torch[facing=south]",
-      "0,0,4": "minecraft:redstone_wire",
-      "0,0,5": "minecraft:repeater[facing=north]",
-      "1,0,2": "minecraft:repeater[facing=east]",
-      "1,0,4": "minecraft:redstone_wire",
-      "2,0,0": "minecraft:white_wool",
-      "2,0,1": "minecraft:repeater[facing=north]",
-      "2,0,2": "minecraft:white_wool",
-      "2,0,4": "minecraft:redstone_wire",
-      "3,0,2": "minecraft:redstone_wall_torch[facing=east]",
-      "3,0,4": "minecraft:redstone_wall_torch[facing=west]",
-      "4,0,0": "minecraft:white_wool",
-      "4,0,1": "minecraft:redstone_wall_torch[facing=south]",
-      "4,0,2": "minecraft:redstone_wire",
-      "4,0,3": "minecraft:redstone_wire",
-      "4,0,4": "minecraft:white_wool",
-      "0,1,0": "minecraft:redstone_torch",
-      "0,1,1": "minecraft:redstone_wire",
-      "0,1,2": "minecraft:redstone_wire"
+      "0,0,0": "minecraft:redstone_wire",
+      "2,0,0": "minecraft:redstone_wire",
+      "3,0,0": "minecraft:white_wool",
+      "4,0,0": "minecraft:redstone_wire",
+      "0,0,1": "minecraft:redstone_wire",
+      "1,0,1": "minecraft:redstone_wire",
+      "2,0,1": "minecraft:white_wool",
+      "3,0,1": "minecraft:repeater[delay=1,facing=west,locked=false,powered=false]",
+      "4,0,1": "minecraft:comparator[facing=north,mode=subtract,powered=false]",
+      "4,0,2": "minecraft:white_wool",
+      "3,1,0": "minecraft:redstone_wire",
+      "4,1,0": "minecraft:white_wool",
+      "2,1,1": "minecraft:redstone_torch[lit=true]",
+      "3,1,1": "minecraft:white_wool",
+      "4,1,1": "minecraft:white_wool",
+      "4,1,2": "minecraft:redstone_wire",
+      "4,2,0": "minecraft:redstone_wire",
+      "2,2,1": "minecraft:white_wool",
+      "3,2,1": "minecraft:repeater[delay=1,facing=west,locked=false,powered=false]",
+      "4,2,1": "minecraft:comparator[facing=north,mode=subtract,powered=false]",
+      "4,2,2": "minecraft:white_wool",
+      "4,0,3": "minecraft:repeater[delay=1,facing=north,locked=false,powered=false]"
     }
   }
 }

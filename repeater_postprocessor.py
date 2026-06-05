@@ -181,6 +181,7 @@ def get_score(block_map, sources, repeaters):
     """
     Simulates the redstone network and returns the total sum of power levels.
     Pro kubu: tohle by se nejspíš mělo vylepšit. ještě to negeneruje uplně optimální řešení
+    omezit sčítání powerů na pouze jeden graf a ne celý obvod
     """
     powers = {}
     queue = deque()
@@ -234,13 +235,19 @@ def build_graph(block_map, sources):
     Builds a directed graph representing redstone flow from sources.
     Uses BFS to track power, backtracks to place repeaters when power hits 0.
     """
-    print(f"Building graph from {len(sources)} sources...")
-    graph = {}
-    queue = deque()
-    repeaters = {}
-    
-    for src_pos, power, d in sources:
-        # Initial wire power from source is 15
+    print(f"Building graphs for {len(sources)} sources...")
+    final_graph = {}
+    global_repeaters = {}
+    processed_count = 0
+
+    for i, source in enumerate(sources):
+        src_pos, _, _ = source
+        print(f"Processing source {i+1}/{len(sources)} at {src_pos}")
+        
+        # Local graph for this source
+        graph = {}
+        queue = deque()
+        
         graph[src_pos] = {
             'pos': src_pos,
             'is_eligible': is_eligible(src_pos, block_map),
@@ -249,110 +256,123 @@ def build_graph(block_map, sources):
         }
         queue.append((src_pos, 15, [src_pos]))
         
-    processed_count = 0
-    while queue:
-        pos, power, path = queue.popleft()
-        processed_count += 1
-        if processed_count % 1000 == 0:
-            print(f"Processed {processed_count} nodes, {len(repeaters)} repeaters placed...")
+        while queue:
+            pos, power, path = queue.popleft()
+            processed_count += 1
 
-        state = block_map.get(pos)
-        
-        if power < graph[pos]['power']:
-            continue
+            state = block_map.get(pos)
+            if not state: continue
             
-        if power == 0:
-            # Backtrack to find repeater placement using scoring
-            best_score = -1
-            best_rp = None
-            best_dir = None
-            best_i = -1
-            
-            for i in range(len(path) - 1, -1, -1):
-                rp = path[i]
-                eligible = is_eligible(rp, block_map)
-                if rp not in repeaters and eligible:
-                    # Determine direction from rp to path[i+1]
-                    dx, dz = 0, 0
-                    if i + 1 < len(path):
-                        next_p = path[i+1]
-                        dx, dz = next_p[0] - rp[0], next_p[2] - rp[2]
-                    elif i > 0:
-                        prev_p = path[i-1]
-                        dx, dz = rp[0] - prev_p[0], rp[2] - prev_p[2]
-                        
-                    direction = None
-                    if dx == 1: direction = "west"
-                    elif dx == -1: direction = "east"
-                    elif dz == 1: direction = "north"
-                    elif dz == -1: direction = "south"
-                    
-                    if direction:
-                            test_repeaters = repeaters.copy()
-                            test_repeaters[rp] = direction
-                            score = get_score(block_map, sources, test_repeaters)
-                            
-                            if score < best_score:
-                                break
-                            elif score > best_score:
-                                best_score = score
-                                best_rp = rp
-                                best_dir = direction
-                                best_i = i
-                                
-            if best_rp:
-                #backtrack_dist = (len(path) - 1) - best_i
-                #bt_str = f" (Backtracked {backtrack_dist} blocks)" if backtrack_dist > 0 else " (No backtracking)"
-                #print(f"  Placing repeater at {best_rp}{bt_str} (Score: {best_score})")
-                
-                repeaters[best_rp] = best_dir
-                graph[best_rp]['power'] = 15
-                
-                # Reset downstream to remove redundant repeaters
-                downstream_nodes = get_downstream(best_rp, graph)
-                for d_pos in downstream_nodes:
-                    if d_pos in graph:
-                        graph[d_pos]['power'] = -1
-                        graph[d_pos]['connections'] = []
-                    if d_pos in repeaters:
-                        del repeaters[d_pos]
-                
-                # Clean main queue of downstream nodes
-                new_queue = deque()
-                for q_pos, q_pwr, q_path in queue:
-                    if q_pos not in downstream_nodes:
-                        new_queue.append((q_pos, q_pwr, q_path))
-                queue = new_queue
-                
-                queue.append((best_rp, 15, [best_rp]))
+            if power < graph[pos]['power']:
                 continue
-        
-        if power > 0:
-            conns = get_connections(pos, state, block_map)
-            for direction, y_off in conns:
-                off = get_offset(direction)
-                npos = (pos[0] + off[0], pos[1] + y_off, pos[2] + off[2])
                 
-                if npos in block_map:
-                    n_power = power - 1
-                    
-                    if npos not in graph:
-                        graph[npos] = {
-                            'pos': npos,
-                            'is_eligible': is_eligible(npos, block_map),
-                            'connections': [],
-                            'power': -1
-                        }
-                    
-                    if n_power >= graph[npos]['power']:
-                        if npos not in graph[pos]['connections']:
-                            graph[pos]['connections'].append(npos)
+            if power == 0:
+                # Backtrack to find repeater placement using scoring
+                best_score = -1
+                best_rp = None
+                best_dir = None
+                
+                for j in range(len(path) - 1, -1, -1):
+                    rp = path[j]
+                    if is_eligible(rp, block_map):
+                        # Determine direction
+                        dx, dz = 0, 0
+                        if j + 1 < len(path):
+                            next_p = path[j+1]
+                            dx, dz = next_p[0] - rp[0], next_p[2] - rp[2]
+                        elif j > 0:
+                            prev_p = path[j-1]
+                            dx, dz = rp[0] - prev_p[0], rp[2] - prev_p[2]
+                            
+                        direction = None
+                        if dx == 1: direction = "west"
+                        elif dx == -1: direction = "east"
+                        elif dz == 1: direction = "north"
+                        elif dz == -1: direction = "south"
                         
-                        if n_power > graph[npos]['power']:
-                            graph[npos]['power'] = n_power
-                            queue.append((npos, n_power, path + [npos]))
+                        if direction:
+                            # Reuse existing global repeater if possible
+                            if rp in global_repeaters and global_repeaters[rp] == direction:
+                                best_rp, best_dir, best_score = rp, direction, float('inf')
+                                break
+                                
+                            if rp not in global_repeaters:
+                                test_repeaters = global_repeaters.copy()
+                                test_repeaters[rp] = direction
+                                # Evaluate score ONLY for this source
+                                score = get_score(block_map, [source], test_repeaters)
+                                
+                                if score > best_score:
+                                    best_score, best_rp, best_dir = score, rp, direction
+                                elif score < best_score and best_score != -1:
+                                    # Optimization: score usually increases then decreases as we backtrack
+                                    break
+                                    
+                if best_rp:
+                    global_repeaters[best_rp] = best_dir
+                    graph[best_rp]['power'] = 15
+                    
+                    # Reset downstream in the local graph
+                    downstream = get_downstream(best_rp, graph)
+                    for d_pos in downstream:
+                        if d_pos in graph:
+                            graph[d_pos]['power'] = -1
+                            graph[d_pos]['connections'] = []
+                    
+                    # Clean main queue of downstream nodes
+                    new_queue = deque()
+                    for q_pos, q_pwr, q_path in queue:
+                        if q_pos not in downstream:
+                            new_queue.append((q_pos, q_pwr, q_path))
+                    queue = new_queue
+                    
+                    queue.append((best_rp, 15, [best_rp]))
+                    continue
+            
+            if power > 0:
+                conns = get_connections(pos, state, block_map)
+                for direction, y_off in conns:
+                    off = get_offset(direction)
+                    npos = (pos[0] + off[0], pos[1] + y_off, pos[2] + off[2])
+                    
+                    if npos in block_map:
+                        n_power = power - 1
+                        # Boost power if there's an existing repeater
+                        if npos in global_repeaters:
+                            n_power = 15
+                            
+                        if npos not in graph:
+                            graph[npos] = {
+                                'pos': npos,
+                                'is_eligible': is_eligible(npos, block_map),
+                                'connections': [],
+                                'power': -1
+                            }
                         
-    return graph, repeaters
+                        if n_power >= graph[npos]['power']:
+                            if npos not in graph[pos]['connections']:
+                                graph[pos]['connections'].append(npos)
+                            
+                            if n_power > graph[npos]['power']:
+                                graph[npos]['power'] = n_power
+                                queue.append((npos, n_power, path + [npos]))
+
+        # Merge local graph into final_graph
+        for p, data in graph.items():
+            if p not in final_graph:
+                final_graph[p] = {
+                    'pos': p,
+                    'is_eligible': data['is_eligible'],
+                    'connections': list(data['connections']),
+                    'power': data['power']
+                }
+            else:
+                final_graph[p]['power'] = max(final_graph[p]['power'], data['power'])
+                for c in data['connections']:
+                    if c not in final_graph[p]['connections']:
+                        final_graph[p]['connections'].append(c)
+
+    return final_graph, global_repeaters
 
 def draw_arrow(screen, color, rect, direction):
     """

@@ -45,6 +45,13 @@ library(my_simple_gates) {
     pin(B) { direction: input; }
     pin(Y) { direction: output; function: "(A^B)'"; }
   }
+  cell(MUX) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(S) { direction: input; }
+    pin(Y) { direction: output; function: "(S*B) + (S'*A)"; }
+  }
   cell(DECODER2_4) {
     area: 4;
     pin(A) { direction: input; }
