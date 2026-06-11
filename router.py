@@ -1,571 +1,305 @@
-import math
+from logic_gates import Circuit
 
 class Pin:
-    def __init__(self, x, top):
-        self.x = x
-        self.top = top
-        self.net_id = -1
-        self.is_empty = False
-
-    def set_net(self, net_id, out_net):
-        if not out_net and self.net_id != -1:
-            raise Exception("Should not assign pin to two different nets")
-        self.net_id = net_id
-
-class EmptyPin(Pin):
-    def __init__(self, x, top):
-        super().__init__(x, top)
-        self.is_empty = True
-        
-    def set_net(self, net_id, out_net):
-        raise Exception("Cant set net of empty pin")
-
-class PinPair:
-    def __init__(self, x):
-        self.top = EmptyPin(x, True)
-        self.bot = EmptyPin(x, False)
-
-class PinsArray:
-    def __init__(self):
-        self.pairs = []
-        
-    def add_pin(self, p, top):
-        index = p.x // 2
-        diff = index - len(self.pairs)
-        if diff >= 0:
-            for i in range(diff):
-                self.pairs.append(PinPair(len(self.pairs) * 2))
-            new_pair = PinPair(len(self.pairs) * 2)
-            if top: new_pair.top = p
-            else: new_pair.bot = p
-            self.pairs.append(new_pair)
-        else:
-            pair = self.pairs[index]
-            if top:
-                if pair.top.is_empty: pair.top = p
-                else: raise Exception("Overwrite top pin")
-            else:
-                if pair.bot.is_empty: pair.bot = p
-                else: raise Exception("Overwrite bot pin")
-                
-    def add_empty_pair(self):
-        x = len(self.pairs) * 2
-        self.pairs.append(PinPair(x))
-        return x
-
-class GatePins:
-    def __init__(self, g, v, offset, top):
-        self.vertex = v
-        self.offset = offset
-        self.top = top
-        self.gate_width = g.size_x
-        self.pins = []
-        self.next_free_input_pin = 0
-        
-        if top:
-            # Use custom offsets if provided, otherwise default to spacing
-            offsets = getattr(g, 'output_offsets', None)
-            if offsets:
-                for off in offsets:
-                    self.pins.append(Pin(offset + off, True))
-            else:
-                for i in range(g.num_outputs):
-                    self.pins.append(Pin(offset + (i * (1 + g.output_spacing)), True))
-        else:
-            offsets = getattr(g, 'input_offsets', None)
-            if offsets:
-                for off in offsets:
-                    self.pins.append(Pin(offset + off, False))
-            else:
-                for i in range(g.num_inputs):
-                    self.pins.append(Pin(offset + (i * (1 + g.input_spacing)), False))
-                
-    def get_next_pin(self, v=None):
-        if self.next_free_input_pin >= len(self.pins):
-            raise Exception(f"Too many input pins requested from gate for vertex {self.vertex}. Requested {self.next_free_input_pin+1}, but only have {len(self.pins)}")
-        self.next_free_input_pin += 1
-        return self.pins[self.next_free_input_pin - 1]
-        
-    def has_next_pin(self):
-        return self.next_free_input_pin < len(self.pins)
-
-class MuxPins(GatePins):
-    def __init__(self, g, v, offset, top):
-        super().__init__(g, v, offset, top)
-        
-    def get_next_pin(self, v=None):
-        return super().get_next_pin(v)
+    def __init__(self, x, y, is_top):
+        self.x = int(x)
+        self.y = int(y)
+        self.is_top = is_top
 
 class Net:
-    def __init__(self, yosys_id, x_min=float('inf'), x_max=-1):
-        self.id = yosys_id
+    def __init__(self, net_id, pins):
+        self.id = net_id
+        self.pins = pins # List of Pin objects
         self.track = -1
-        self.pins = []
-        self.top_pin = None
-        self.x_min = x_min
-        self.x_max = x_max
+        self.dogleg_x = -1
         self.outpath = False
-        self.out_pin = None
         self.out_partner = None
 
-    def add_pin(self, p, dogleg):
-        if p in self.pins: return
-        p.set_net(self.id, dogleg)
-        self.pins.append(p)
-        if p.top:
-            if self.top_pin is not None:
-                raise Exception(f"Net {self.id} already has an input (top pin) at x={self.top_pin.x}. Cannot add another at x={p.x}")
-            self.top_pin = p
-        if p.x < self.x_min: self.x_min = p.x
-        if p.x > self.x_max: self.x_max = p.x
-        
-    def has_horizontal_conflict(self, other):
-        # A conflict exists if there isn't at least a 1-block gap between the segments.
-        return not (self.x_max < other.x_min - 1 or self.x_min > other.x_max + 1)
+    def get_x_min(self):
+        m = min(p.x for p in self.pins) if self.pins else 0
+        if self.dogleg_x != -1: m = min(m, self.dogleg_x)
+        return m
 
-    def set_out_net(self, out_pin, original):
-        self.pins.append(out_pin)
-        self.outpath = True
-        self.out_pin = out_pin
-        self.top_pin = out_pin
-        out_pin.set_net(self.id, True)
-        
-        self.out_partner = original
-        original.out_partner = self
-        if out_pin in original.pins:
-            original.pins.remove(out_pin)
-            
-    def assign_out_col_x(self, out_col_x):
-        self.x_max = out_col_x
-        self.x_min = self.out_pin.x
-        self.out_partner.x_max = out_col_x
-        return out_col_x
-        
-    def track_z(self):
-        return (self.track * 2) + 1
+    def get_x_max(self):
+        m = max(p.x for p in self.pins) if self.pins else 0
+        if self.dogleg_x != -1: m = max(m, self.dogleg_x)
+        return m
 
-class Node:
-    def __init__(self, net_id):
-        self.net_id = net_id
-        self.routed = False
-        self.edges = []
+    def overlaps(self, other):
+        return not (self.get_x_max() < other.get_x_min() - 1 or self.get_x_min() > other.get_x_max() + 1)
 
-class VCG:
-    def __init__(self, pin_pairs, nets):
-        self.nodes = {}
-        self.num_nets_routed = 0
-        self.edges_done = []
-        
-        for pair in pin_pairs.pairs:
-            if not pair.top.is_empty:
-                if pair.top.net_id not in self.nodes:
-                    self.nodes[pair.top.net_id] = Node(pair.top.net_id)
-            if not pair.bot.is_empty:
-                if pair.bot.net_id not in self.nodes:
-                    self.nodes[pair.bot.net_id] = Node(pair.bot.net_id)
-            
-            if not pair.top.is_empty and not pair.bot.is_empty and pair.top.net_id != pair.bot.net_id:
-                if self.edge_done(pair.top.net_id, pair.bot.net_id): continue
-                
-                if not self.cycle(self.nodes[pair.top.net_id], pair.bot.net_id):
-                    self.nodes[pair.bot.net_id].edges.append(self.nodes[pair.top.net_id])
-                    self.edges_done.append((pair.top.net_id, pair.bot.net_id))
-                else:
-                    # Create unique dogleg ID based on parent net ID
-                    dogleg_id = pair.top.net_id + 50000 
-                    out_net = Net(dogleg_id)
-                    nets[out_net.id] = out_net
-                    out_partner = nets[pair.top.net_id]
-                    out_net.set_out_net(pair.top, out_partner)
-                    
-                    x_max = out_net.assign_out_col_x(pin_pairs.add_empty_pair())
-                    
-                    out_node = Node(out_net.id)
-                    self.nodes[out_net.id] = out_node
-                    self.nodes[pair.bot.net_id].edges.append(out_node)
-                    self.edges_done.append((pair.top.net_id, pair.bot.net_id))
+def route(nets_input, top_gates=None, bot_gates=None):
+    """
+    nets_input: List of lists, where each inner list contains (x, y, is_top) tuples.
+    top_gates/bot_gates: Optional lists of gate objects to track occupied X-coordinates.
+    Returns a Circuit object.
+    """
+    # 0. Validate pins: Ensure no two different nets use the same pin coordinate
+    pin_to_net = {}
+    for i, pin_list in enumerate(nets_input):
+        for (px, py, is_top) in pin_list:
+            coord = (px, py, is_top)
+            if coord in pin_to_net:
+                if pin_to_net[coord] != i:
+                    side = "Top" if is_top else "Bottom"
+                    raise ValueError(f"EXCEPTION: Pin at {side} X={px} is used by multiple nets (Net {pin_to_net[coord]+1} and Net {i+1})!")
+            pin_to_net[coord] = i
 
-    def get_edge_ids(self, net_id):
-        n = self.nodes.get(net_id)
-        if not n: return []
-        return [e.net_id for e in n.edges]
+    # 1. Initialize Net objects
+    nets = []
+    for i, pin_list in enumerate(nets_input):
+        net_pins = [Pin(px, py, is_top) for (px, py, is_top) in pin_list]
+        nets.append(Net(i + 1, net_pins))
 
-    def edge_done(self, top, bot):
-        return (top, bot) in self.edges_done
-        
-    def cycle(self, n, cycle_id):
-        if n.net_id == cycle_id: return True
-        for e in n.edges:
-            if self.cycle(e, cycle_id): return True
+    # 2. VCG and doglegs
+    occupied_xs = set()
+    for g in (top_gates or []):
+        off = getattr(g, 'x_offset', 0)
+        for x in range(off, off + g.size_x): occupied_xs.add(x)
+    for g in (bot_gates or []):
+        off = getattr(g, 'x_offset', 0)
+        for x in range(off, off + g.size_x): occupied_xs.add(x)
+    for n in nets:
+        for p in n.pins: occupied_xs.add(p.x)
+
+    x_map = {}
+    for n in nets:
+        for p in n.pins:
+            if p.x not in x_map: x_map[p.x] = {'top': set(), 'bot': set()}
+            if p.is_top: x_map[p.x]['top'].add(n.id)
+            else: x_map[p.x]['bot'].add(n.id)
+
+    adj = {n.id: set() for n in nets}
+    def has_path(u, v):
+        vis = {u}; q = [u]
+        while q:
+            curr = q.pop(0)
+            for neighbor in adj.get(curr, []):
+                if neighbor == v: return True
+                if neighbor not in vis:
+                    vis.add(neighbor)
+                    q.append(neighbor)
         return False
 
-    def can_route(self, net_id):
-        n = self.nodes.get(net_id)
-        if not n or n.routed: return False
-        for e in n.edges:
-            if not e.routed: return False
-        return True
-
-    def routed(self, net_id):
-        n = self.nodes[net_id]
-        if n.routed: raise Exception("Routed same twice")
-        n.routed = True
-        self.num_nets_routed += 1
-
-    def done(self):
-        return len(self.nodes) == self.num_nets_routed
-
-class Channel:
-    def __init__(self, pins_array):
-        self.pins_array = pins_array
-        self.tracks = []
-        self.straight_nets = []
-
-    def find_available_track(self, net, vcg):
-        if not net: return
-        highest_track = 0
-        for vc_id in vcg.get_edge_ids(net.id):
-            for track in self.tracks:
-                for n in track:
-                    if n.id == vc_id and n.track >= highest_track:
-                        highest_track = n.track + 1
-
-        for i in range(highest_track, len(self.tracks)):
-            has_conflict = False
-            for n in self.tracks[i]:
-                if n.has_horizontal_conflict(net):
-                    has_conflict = True
-                    break
-            if not has_conflict:
-                self.tracks[i].append(net)
-                net.track = i
-                return
-
-        self.tracks.append([net])
-        net.track = len(self.tracks) - 1
-
-    def gen_channel_circuit(self):
-        from logic_gates import Circuit
-        length = (len(self.tracks) * 2) + 1
-        height = 3
-        width = 0
-
-        all_nets = self.straight_nets + [n for track in self.tracks for n in track]
-        for n in all_nets:
-            if n.x_max > width: width = n.x_max
-        width += 1
-
-        circuit = Circuit(width, height, length)
-        nets_done = []
-
-        # (x, z) -> net_id for adjacency validation
-        occupied_xz = {}
-        def check_adjacency(x, z, net_id):
-            for dx in [-1, 1]:
-                if (x + dx, z) in occupied_xz:
-                    other_net = occupied_xz[(x + dx, z)]
-                    if other_net != net_id:
-                        raise Exception(f"SHORT DETECTED: Net {net_id} and Net {other_net} are adjacent at x={x}/{x+dx}, z={z}.")
-            occupied_xz[(x, z)] = net_id
-
-        # Draw Straight Nets first (flat at y=0)
-        for n in self.straight_nets:
-            for z in range(circuit.size_z):
-                check_adjacency(n.x_min, z, n.id)
-            self.wire_columns(circuit, n)
-            self.repeat_nets(circuit, n)
-            nets_done.append(n)
-
-        # Draw Routed Nets (humps through tracks)
-        for track in self.tracks:
-            for n in track:
-                if n in nets_done: continue
-                
-                z_track = (n.track * 2) + 1
-                dog_x = getattr(n, 'dogleg_x', n.x_max)
-                
-                # Dropped positions validation
-                for p in n.pins: check_adjacency(p.x, z_track, n.id)
-                if n.outpath or (n.out_partner and not n.outpath):
-                    check_adjacency(dog_x, z_track, n.id)
-                
-                # Vertical columns validation
-                for p in n.pins:
-                    if p.top:
-                        for z in range(0, n.track_z() - 1): check_adjacency(p.x, z, n.id)
-                    else:
-                        for z in range(n.track_z() + 2, circuit.size_z): check_adjacency(p.x, z, n.id)
+    final_nets = list(nets)
+    for x in sorted(list(x_map.keys())):
+        tops, bots = x_map[x]['top'], x_map[x]['bot']
+        for t in tops:
+            for b in bots:
+                if t != b:
+                    if has_path(t, b):
+                        dog_id = t + 50000
+                        t_net = next(n for n in nets if n.id == t)
+                        
+                        best_x = -1
+                        cand_dist = 0
+                        while best_x == -1:
+                            for dx in [cand_dist, -cand_dist]:
+                                cand = x + dx
+                                if cand >= 0 and cand % 2 == 0 and cand not in occupied_xs:
+                                    best_x = cand
+                                    break
+                            if best_x != -1: break
+                            cand_dist += 1
                             
-                if n.outpath:
-                    for z in range(n.track_z() + 2, n.out_partner.track_z() - 1):
-                        check_adjacency(dog_x, z, n.id)
+                        occupied_xs.add(best_x)
+                        conflict_pins = [p for p in t_net.pins if p.x == x and p.is_top]
+                        for cp in conflict_pins: t_net.pins.remove(cp)
+                        
+                        d_net = Net(dog_id, conflict_pins)
+                        d_net.outpath = True
+                        d_net.dogleg_x = best_x
+                        d_net.out_partner = t_net
+                        t_net.out_partner = d_net
+                        t_net.dogleg_x = best_x
+                        adj[dog_id] = set()
+                        if t in adj[b]: adj[b].remove(t)
+                        adj[b].add(dog_id)
+                        final_nets.append(d_net)
+                    else:
+                        adj[b].add(t)
 
-                self.place_track(circuit, n.track, n.x_min, n.x_max, n.pins, n)
-                nets_done.append(n)
+    # 3. Straight Nets and Track Assignment
+    remaining = list(final_nets)
+    straight_nets = []
+    
+    # Identify straight nets (no horizontal span and no dependencies)
+    for n in list(remaining):
+        if n.get_x_min() == n.get_x_max() and not n.outpath:
+            is_independent = True
+            for other_id, deps in adj.items():
+                if n.id in deps:
+                    is_independent = False; break
+            if is_independent and not adj[n.id]:
+                straight_nets.append(n)
+                remaining.remove(n)
+                n.track = -2
 
-                if n.outpath:
-                    circuit.set_block(n.dogleg_x, 0, n.track_z() + 1, "minecraft:redstone_wire")
-                if n.out_partner and not n.outpath:
-                    circuit.set_block(n.dogleg_x, 0, n.track_z() - 1, "minecraft:redstone_wire")
+    routed = []
+    tracks = []
+    while remaining:
+        ready = [n for n in remaining if all(dep not in [rn.id for rn in remaining] for dep in adj.get(n.id, []))]
+        ready.sort(key=lambda n: n.get_x_min())
+        if not ready: break
+        for n in ready:
+            min_t = 0
+            for dep in adj.get(n.id, []):
+                try:
+                    dep_net = next(rn for rn in routed if rn.id == dep)
+                    min_t = max(min_t, dep_net.track + 1)
+                except StopIteration:
+                    pass # Probably a straight net
+                    
+            assigned = False
+            for t_idx in range(min_t, len(tracks)):
+                if not any(n.overlaps(on) for on in tracks[t_idx]):
+                    tracks[t_idx].append(n)
+                    n.track = t_idx
+                    assigned = True
+                    break
+            if not assigned:
+                n.track = len(tracks)
+                tracks.append([n])
+            routed.append(n)
+            remaining.remove(n)
 
-                self.wire_columns(circuit, n)
-                self.repeat_nets(circuit, n)
+    # 4. Circuit Generation
+    max_x = max(n.get_x_max() for n in final_nets) if final_nets else 0
+    length = len(tracks) * 2 + 1
+    circuit = Circuit(int(max_x + 1), 3, length)
+    
+    occupied_xyz = {} # (x, y, z) -> nid
+    def check_adj(x, y, z, nid):
+        for dx in [-1, 1]:
+            if (x+dx, y, z) in occupied_xyz:
+                other_nid = occupied_xyz[(x+dx, y, z)]
+                if other_nid != nid:
+                    # Allow adjacency ONLY if one is a dogleg partner of the other
+                    is_partner = False
+                    for n_obj in final_nets:
+                        if n_obj.id == nid:
+                            if n_obj.out_partner and n_obj.out_partner.id == other_nid: is_partner = True
+                        if n_obj.id == other_nid:
+                            if n_obj.out_partner and n_obj.out_partner.id == nid: is_partner = True
+                    
+                    if not is_partner:
+                        raise Exception(f"SHORT: {nid} & {other_nid} at x={x}/{x+dx}, y={y}, z={z}")
+        occupied_xyz[(x, y, z)] = nid
 
-        # Identify contiguous segments of light_gray_wool at y=1 (sub-bridges)
-        light_gray_blocks = [(x, z) for (x, y, z), b in circuit.blocks.items() if y == 1 and b == "minecraft:light_gray_wool"]
-        segments_by_z = {} # z -> list of [xmin, xmax]
-        for x, z in sorted(light_gray_blocks, key=lambda p: (p[1], p[0])):
-            if z not in segments_by_z: segments_by_z[z] = [[x, x]]
-            else:
-                last = segments_by_z[z][-1]
-                if x == last[1] + 1: last[1] = x
-                else: segments_by_z[z].append([x, x])
+    # Draw Straight Nets
+    for n in straight_nets:
+        for z in range(length):
+            circuit.set_block(int(n.get_x_min()), 0, z, "minecraft:redstone_wire")
+            check_adj(int(n.get_x_min()), 0, z, n.id)
 
-        # Decide which sub-bridge segments to lower
-        lowered_segments = set() # (xmin, xmax, z)
-        all_segments = set() # (xmin, xmax, z)
-        for z, segs in segments_by_z.items():
-            for xmin, xmax in segs:
-                all_segments.add((xmin, xmax, z))
-                if all(not circuit.blocks.get((x, 0, z)) for x in range(xmin, xmax + 1)):
-                    lowered_segments.add((xmin, xmax, z))
-
-        # Decide which special blocks (pins/doglegs) to lower
-        special_blocks = {(x, z) for (x, y, z), b in circuit.blocks.items() if y == 0 and b in ["minecraft:cyan_wool", "minecraft:pink_wool", "minecraft:yellow_wool"]}
-        lowered_specials = set()
-        for sx, sz in special_blocks:
-            # A special block is lowered if ALL segments touching it are also being lowered
-            touching_segments = [s for s in all_segments if s[2] == sz and (s[0] == sx + 1 or s[1] == sx - 1)]
-            if touching_segments and all(s in lowered_segments for s in touching_segments):
-                lowered_specials.add((sx, sz))
-
-        # Execute lowering for segments
-        for xmin, xmax, z in lowered_segments:
+    # Draw Track Nets
+    for t_idx, track_nets in enumerate(tracks):
+        zt = t_idx * 2 + 1
+        for n in track_nets:
+            xmin, xmax = int(n.get_x_min()), int(n.get_x_max())
+            blen = xmax - xmin + 1
+            color = "minecraft:red_wool" if blen <= 4 else "minecraft:light_gray_wool"
+            txs = {p.x for p in n.pins if p.is_top}
+            bxs = {p.x for p in n.pins if not p.is_top}
+            dxs = {int(n.dogleg_x)} if n.dogleg_x != -1 else set()
+            
             for x in range(xmin, xmax + 1):
-                b = circuit.blocks.get((x, 2, z), "minecraft:redstone_wire")
-                circuit.set_block(x, 0, z, b)
-                if (x, 1, z) in circuit.blocks: del circuit.blocks[(x, 1, z)]
-                if (x, 2, z) in circuit.blocks: del circuit.blocks[(x, 2, z)]
-        
-        # Execute lowering for special blocks
-        for sx, sz in lowered_specials:
-            b = circuit.blocks.get((sx, 1, sz), "minecraft:redstone_wire")
-            circuit.set_block(sx, 0, sz, b)
-            if (sx, 1, sz) in circuit.blocks: del circuit.blocks[(sx, 1, sz)]
+                if blen <= 4:
+                    circuit.set_block(x, 0, zt, "minecraft:redstone_wire")
+                    check_adj(x, 0, zt, n.id)
+                elif x in txs:
+                    circuit.set_block(x, 0, zt, "minecraft:cyan_wool")
+                    circuit.set_block(x, 1, zt, "minecraft:redstone_wire")
+                    check_adj(x, 1, zt, n.id)
+                elif x in bxs:
+                    circuit.set_block(x, 0, zt, "minecraft:pink_wool")
+                    circuit.set_block(x, 1, zt, "minecraft:redstone_wire")
+                    check_adj(x, 1, zt, n.id)
+                elif x in dxs:
+                    circuit.set_block(x, 0, zt, "minecraft:yellow_wool")
+                    circuit.set_block(x, 1, zt, "minecraft:redstone_wire")
+                    check_adj(x, 1, zt, n.id)
+                else:
+                    circuit.set_block(x, 1, zt, color)
+                    circuit.set_block(x, 2, zt, "minecraft:redstone_wire")
+                    check_adj(x, 2, zt, n.id)
                 
-        return circuit
+            for p in n.pins:
+                zs = zt - 1 if p.is_top else zt + 1
+                circuit.set_block(p.x, 0, zs, "minecraft:redstone_wire")
+                check_adj(p.x, 0, zs, n.id)
+            if n.outpath:
+                circuit.set_block(int(n.dogleg_x), 0, zt + 1, "minecraft:redstone_wire")
+                check_adj(int(n.dogleg_x), 0, zt + 1, n.id)
+            if n.out_partner and not n.outpath:
+                circuit.set_block(int(n.dogleg_x), 0, zt - 1, "minecraft:redstone_wire")
+                check_adj(int(n.dogleg_x), 0, zt - 1, n.id)
 
-    def place_track(self, channel, track_number, xmin, xmax, pins, n):
-        z_track = (track_number * 2) + 1
-        z_min = z_track - 1
-        
-        dogleg_x = getattr(n, 'dogleg_x', xmax)
-        actual_xmax = max(xmax, dogleg_x)
-        
-        top_pin_xs = {p.x for p in pins if p.top}
-        bot_pin_xs = {p.x for p in pins if not p.top}
-        dogleg_xs = set()
-        if n.outpath or (n.out_partner and not n.outpath):
-            dogleg_xs.add(dogleg_x)
+    # Draw vertical runs for Track Nets
+    for track_nets in tracks:
+        for n in track_nets:
+            zt = n.track * 2 + 1
+            for p in n.pins:
+                if p.is_top:
+                    for z in range(0, zt - 1):
+                        circuit.set_block(p.x, 0, z, "minecraft:redstone_wire")
+                        check_adj(p.x, 0, z, n.id)
+                else:
+                    for z in range(zt + 2, length):
+                        circuit.set_block(p.x, 0, z, "minecraft:redstone_wire")
+                        check_adj(p.x, 0, z, n.id)
+            if n.outpath:
+                zs = zt + 2
+                ze = n.out_partner.track * 2 + 1 - 1
+                for z in range(zs, ze + 1):
+                    circuit.set_block(int(n.dogleg_x), 0, z, "minecraft:redstone_wire")
+                    check_adj(int(n.dogleg_x), 0, z, n.id)
+
+    apply_lowering(circuit)
+    return circuit
+
+def apply_lowering(circuit):
+    blocks = circuit.blocks
+    lg_wool = [(x, z) for (x, y, z), b in blocks.items() if y == 1 and b == "minecraft:light_gray_wool"]
+    segs_by_z = {}
+    for x, z in sorted(lg_wool, key=lambda p: (p[1], p[0])):
+        if z not in segs_by_z: segs_by_z[z] = [[x, x]]
+        else:
+            last = segs_by_z[z][-1]
+            if x == last[1] + 1: last[1] = x
+            else: segs_by_z[z].append([x, x])
             
-        pin_xs = top_pin_xs | bot_pin_xs | dogleg_xs
-        
-        bridge_length = actual_xmax - xmin + 1
-        bridge_color = "minecraft:red_wool" if bridge_length <= 4 else "minecraft:light_gray_wool"
-        
-        is_short_bridge = (bridge_length <= 4)
-        for x in range(xmin, actual_xmax + 1):
-            if is_short_bridge:
-                # Flat bridge at ground level (y=0)
-                channel.set_block(x, 0, z_track, "minecraft:redstone_wire")
-            elif x in top_pin_xs:
-                channel.set_block(x, 0, z_track, "minecraft:cyan_wool")
-                channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
-            elif x in bot_pin_xs:
-                channel.set_block(x, 0, z_track, "minecraft:pink_wool")
-                channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
-            elif x in dogleg_xs:
-                channel.set_block(x, 0, z_track, "minecraft:yellow_wool")
-                channel.set_block(x, 1, z_track, "minecraft:redstone_wire")
-            else:
-                channel.set_block(x, 1, z_track, bridge_color)
-                channel.set_block(x, 2, z_track, "minecraft:redstone_wire")
-            
-        for p in pins:
-            z_pin = (z_track - 1) if p.top else (z_track + 1)
-            channel.set_block(p.x, 0, z_pin, "minecraft:redstone_wire")
-
-    def wire_columns(self, channel, n):
-        def set_wire(x, y, z):
-            existing = channel.blocks.get((x, y, z))
-            if not existing or "redstone_wire" in existing:
-                channel.set_block(x, y, z, "minecraft:redstone_wire")
-
-        if n.track == -2:
-            for z in range(channel.size_z): set_wire(n.x_min, 0, z)
-            return
-
-        for p in n.pins:
-            if p.top:
-                for z in range(0, n.track_z() - 1): set_wire(p.x, 0, z)
-            else:
-                for z in range(n.track_z() + 2, channel.size_z): set_wire(p.x, 0, z)
-                    
-        if n.outpath:
-            dog_x = getattr(n, 'dogleg_x', n.x_max)
-            for z in range(n.track_z() + 2, n.out_partner.track_z() - 1):
-                set_wire(dog_x, 0, z)
-
-    def repeat_nets(self, channel, n):
-        # Repeaters are now handled by the postprocessor.
-        pass
-            
-    def size_x(self):
-        x_max = 0
-        for t in self.tracks:
-            for n in t:
-                if n.x_max > x_max: x_max = n.x_max
-        return x_max
-        
-    def size_z(self):
-        if not self.tracks: return 0
-        return (len(self.tracks) * 2) + 1
-
-class Router:
-    @staticmethod
-    def initialize_pins(top_vertices, top_gates, bottom_vertices, bottom_gates, gate_spacing=1):
-        pin_map = {}
-        pins_array = PinsArray()
-        
-        for i, v in enumerate(top_vertices):
-            g = top_gates[i]
-            # Use g.x_offset if available, otherwise fallback to sequential (should not happen with new logic)
-            offset = getattr(g, 'x_offset', 0) 
-            gp = GatePins(g, v, offset, True)
-            pin_map[v] = gp
-            
-        for i, v in enumerate(bottom_vertices):
-            g = bottom_gates[i]
-            offset = getattr(g, 'x_offset', 0)
-            gp = GatePins(g, v, offset, False)
-            pin_map[v] = gp
-            
-        for v in top_vertices:
-            for p in pin_map[v].pins: pins_array.add_pin(p, True)
-        for v in bottom_vertices:
-            for p in pin_map[v].pins: pins_array.add_pin(p, False)
-        return pin_map, pins_array
-
-    @staticmethod
-    def initialize_nets(top_vertices, bottom_vertices, pin_map):
-        nets = {}
-        # Map Yosys bit IDs to Net objects
-        for v in top_vertices:
-            gate = pin_map[v]
-            # Use the bit ID stored in the vertex from netlist_parser.py
-            bits = getattr(v, 'bits', [])
-            bit_id = bits[0] if bits and isinstance(bits[0], int) else -1
-            
-            while gate.has_next_pin():
-                next_pin = gate.get_next_pin(v)
-                if next_pin.is_empty or next_pin.net_id != -1: continue
+    lowered_segs = []
+    for z, segs in segs_by_z.items():
+        for xmin, xmax in segs:
+            if all((x, 0, z) not in blocks for x in range(xmin, xmax + 1)):
+                lowered_segs.append((xmin, xmax, z))
                 
-                # If we don't have a valid bit_id, fallback to something unique
-                n_id = bit_id if bit_id != -1 else (10000 + len(nets))
-                if n_id not in nets:
-                    nets[n_id] = Net(n_id)
-                net = nets[n_id]
-                net.add_pin(next_pin, False)
-                for next_vertex in v.next:
-                    if next_vertex in pin_map:
-                        net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
-                        
-        for v in bottom_vertices:
-            if v in pin_map:
-                gate = pin_map[v]
-                bits = getattr(v, 'bits', [])
-                bit_id = bits[0] if bits and isinstance(bits[0], int) else -1
-                
-                while gate.has_next_pin():
-                    next_pin = gate.get_next_pin(v)
-                    if next_pin.is_empty or next_pin.net_id != -1: continue
-                    
-                    n_id = bit_id if bit_id != -1 else (20000 + len(nets))
-                    if n_id not in nets:
-                        nets[n_id] = Net(n_id)
-                    net = nets[n_id]
-                    net.add_pin(next_pin, False)
-                    for next_vertex in v.next:
-                        if next_vertex in pin_map:
-                            net.add_pin(pin_map[next_vertex].get_next_pin(v), False)
-        return nets
-
-    @staticmethod
-    def place_nets(nets, pin_pairs, top_gates, bottom_gates, gate_spacing=1):
-        vcg = VCG(pin_pairs, nets)
+    specials = [(x, z) for (x, y, z), b in blocks.items() if y == 0 and b in ["minecraft:cyan_wool", "minecraft:pink_wool", "minecraft:yellow_wool"]]
+    lowered_specials = []
+    
+    # Store lowered segment bounds as tuples for reliable comparison
+    ls_bounds = {(ls[0], ls[1], ls[2]) for ls in lowered_segs}
+    
+    for sx, sz in specials:
+        # Find all bridges (segs) that touch this special block at sx
+        # If ALL bridge segments touching this pin were lowered, we can lower the pin too.
+        all_touching = [tuple(s) for s in segs_by_z.get(sz, []) if s[0] == sx + 1 or s[1] == sx - 1]
         
-        # Accurately track ALL occupied X-coordinates
-        occupied_xs = set()
-        
-        for g in top_gates:
-            off = getattr(g, 'x_offset', 0)
-            for x in range(off, off + g.size_x):
-                occupied_xs.add(x)
+        if all_touching and all((s[0], s[1], sz) in ls_bounds for s in all_touching):
+            lowered_specials.append((sx, sz))
             
-        for g in bottom_gates:
-            off = getattr(g, 'x_offset', 0)
-            for x in range(off, off + g.size_x):
-                occupied_xs.add(x)
+    # Apply lowering for bridges
+    for xmin, xmax, z in lowered_segs:
+        for x in range(xmin, xmax + 1):
+            wire = blocks.get((x, 2, z), "minecraft:redstone_wire")
+            blocks[(x, 0, z)] = wire
+            if (x, 1, z) in blocks: del blocks[(x, 1, z)]
+            if (x, 2, z) in blocks: del blocks[(x, 2, z)]
             
-        # Also track any pins that might be outside gate bodies (though usually they are inside)
-        for pair in pin_pairs.pairs:
-            if not pair.top.is_empty: occupied_xs.add(pair.top.x)
-            if not pair.bot.is_empty: occupied_xs.add(pair.bot.x)
-        
-        for net_id, net in nets.items():
-            if net.outpath and not hasattr(net, 'dogleg_x'):
-                # Search for the best available even x
-                best_x = -1
-                min_dist = float('inf')
-                
-                # Search range: from 0 up to current max + a generous buffer
-                max_occ = max(occupied_xs) if occupied_xs else 0
-                for cand_x in range(0, max_occ + 10, 2):
-                    if cand_x not in occupied_xs:
-                        # Distance to the net's bounding box
-                        dist = max(0, cand_x - net.x_max, net.x_min - cand_x)
-                        
-                        # Tie-break: prefer smaller x to keep the circuit compact
-                        if dist < min_dist or (dist == min_dist and cand_x < best_x):
-                            min_dist = dist
-                            best_x = cand_x
-                
-                net.dogleg_x = best_x
-                net.out_partner.dogleg_x = best_x
-                net.x_max = max(net.x_max, net.dogleg_x)
-                net.out_partner.x_max = max(net.out_partner.x_max, net.dogleg_x)
-                occupied_xs.add(best_x)
-        channel = Channel(pin_pairs)
-        for net_id, net in list(nets.items()):
-            if net.x_min == net.x_max and not net.outpath:
-                is_independent = True
-                for other_id, node in vcg.nodes.items():
-                    if other_id == net_id: continue
-                    if net_id in [e.net_id for e in node.edges]:
-                        is_independent = False
-                        break
-                if is_independent and not vcg.nodes[net_id].edges:
-                    channel.straight_nets.append(net)
-                    net.track = -2
-                    vcg.routed(net_id)
-        while not vcg.done():
-            for pair in pin_pairs.pairs:
-                if not pair.top.is_empty and vcg.can_route(pair.top.net_id):
-                    channel.find_available_track(nets[pair.top.net_id], vcg)
-                    vcg.routed(pair.top.net_id)
-                    break
-                if not pair.bot.is_empty and vcg.can_route(pair.bot.net_id):
-                    channel.find_available_track(nets[pair.bot.net_id], vcg)
-                    vcg.routed(pair.bot.net_id)
-                    break
-        return channel
+    # Apply lowering for hump starts (cyan/pink/yellow)
+    for sx, sz in lowered_specials:
+        # The wire was at y=1, we move it to y=0 (replacing the wool)
+        wire = blocks.get((sx, 1, sz), "minecraft:redstone_wire")
+        blocks[(sx, 0, sz)] = wire
+        if (sx, 1, sz) in blocks: del blocks[(sx, 1, sz)]

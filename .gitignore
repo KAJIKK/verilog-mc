@@ -7,3 +7,5 @@
 !Makefile
 !*.lib
 !*.json
+rs_latch.json
+multiplexer4_1_lut.json

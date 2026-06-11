@@ -1,6 +1,21 @@
 from netlist_parser import VertexType, Vertex, Graph
-from router import Router
+from router import route as route_new
 from logic_gates import LogicGates, Circuit
+
+class ChannelWrapper:
+    def __init__(self, circuit):
+        self.circuit = circuit
+        self.straight_nets = [] # For SVG compatibility (empty for now)
+        self.tracks = []
+        
+    def gen_channel_circuit(self):
+        return self.circuit
+        
+    def size_z(self):
+        return self.circuit.size_z
+        
+    def size_x(self):
+        return self.circuit.size_x
 
 class IntermediateCircuit:
     def __init__(self):
@@ -133,6 +148,27 @@ class IntermediateCircuit:
             print(f"WARNING: Unknown gate type '{ftype}' for vertex {v.name}. Falling back to RELAY.")
             return LogicGates.relay()
 
+    def _get_pins(self, v, g, is_top):
+        pins = []
+        offset = g.x_offset
+        if is_top:
+            offsets = getattr(g, 'output_offsets', None)
+            if offsets:
+                for off in offsets: pins.append(offset + off)
+            else:
+                num_outputs = getattr(g, 'num_outputs', 1)
+                for idx in range(num_outputs):
+                    pins.append(offset + (idx * (1 + getattr(g, 'output_spacing', 1))))
+        else:
+            offsets = getattr(g, 'input_offsets', None)
+            if offsets:
+                for off in offsets: pins.append(offset + off)
+            else:
+                num_inputs = getattr(g, 'num_inputs', 1)
+                for idx in range(num_inputs):
+                    pins.append(offset + (idx * (1 + getattr(g, 'input_spacing', 1))))
+        return pins
+
     def route_channels(self):
         # Initial gate positions for the first layer
         gate_centers = {} # vertex -> x_center
@@ -181,46 +217,61 @@ class IntermediateCircuit:
                 curr_x = start_x + g.size_x + 1
             gate_centers = new_gate_centers
 
-            # Now perform routing with the optimized offsets
-            pin_map, pins_array = Router.initialize_pins(self.vertex_layers[i], self.gate_layers[i], 
-                                                        self.vertex_layers[i+1], self.gate_layers[i+1], 1)
-            nets = Router.initialize_nets(self.vertex_layers[i], self.vertex_layers[i+1], pin_map)
+            # NEW ROUTING LOGIC using router_new.py
+            nets_input = []
+            vertex_pin_counters = {} 
             
-            # Update signs with Net IDs for debugging
-            for net in nets.values():
-                for p in net.pins:
-                    # Look for input/output gates and update their signs
-                    # We find which vertex this pin belongs to
-                    v_found = None
-                    for v, gp in pin_map.items():
-                        if p in gp.pins:
-                            v_found = v
-                            break
+            for v_idx, v in enumerate(top_vertices):
+                g = top_gates[v_idx]
+                out_xs = self._get_pins(v, g, True)
+                
+                bits = getattr(v, 'bits', [])
+                net_id = bits[0] if bits and isinstance(bits[0], int) else -1
+                
+                for ox in out_xs:
+                    pin_list = [(ox, 0, True)]
+                    # Connect to next layer
+                    for vn in v.next:
+                        if vn in bottom_vertices:
+                            vn_idx = bottom_vertices.index(vn)
+                            gn = bottom_gates[vn_idx]
+                            in_xs = self._get_pins(vn, gn, False)
+                            p_idx = vertex_pin_counters.get(vn, 0)
+                            if p_idx < len(in_xs):
+                                pin_list.append((in_xs[p_idx], 0, False))
+                                vertex_pin_counters[vn] = p_idx + 1
                     
-                    if v_found:
-                        idx = -1
-                        is_top = False
-                        if v_found in self.vertex_layers[i]:
-                            idx = self.vertex_layers[i].index(v_found)
-                            is_top = True
-                        elif v_found in self.vertex_layers[i+1]:
-                            idx = self.vertex_layers[i+1].index(v_found)
-                            is_top = False
+                    if len(pin_list) > 1 or (len(pin_list) == 1 and pin_list[0][2]):
+                        nets_input.append(pin_list)
                         
-                        if idx != -1:
-                            layer = self.gate_layers[i] if is_top else self.gate_layers[i+1]
-                            g = layer[idx]
-                            if g.is_io:
-                                # Re-generate the gate with the net_id
-                                if v_found.type == VertexType.INPUT:
-                                    new_g = LogicGates.input_gate(v_found.name, net.id)
-                                else:
-                                    new_g = LogicGates.output_gate(v_found.name, net.id)
-                                new_g.x_offset = g.x_offset
-                                layer[idx] = new_g
+                        # Update signs for IO gates
+                        if g.is_io and net_id != -1:
+                            # Re-generate the gate with the net_id (using index + 1 as placeholder or net_id)
+                            # Using index in nets_input + 1 for now to match router_new labeling
+                            if v.type == VertexType.INPUT:
+                                new_g = LogicGates.input_gate(v.name, net_id)
+                            else:
+                                new_g = LogicGates.output_gate(v.name, net_id)
+                            new_g.x_offset = g.x_offset
+                            top_gates[v_idx] = new_g
 
-            channel = Router.place_nets(nets, pins_array, self.gate_layers[i], self.gate_layers[i+1], 1)
-            self.channels.append(channel)
+            # Also check if any bottom gates are IO and need sign updates
+            for v_idx, v in enumerate(bottom_vertices):
+                g = bottom_gates[v_idx]
+                if g.is_io:
+                    bits = getattr(v, 'bits', [])
+                    net_id = bits[0] if bits and isinstance(bits[0], int) else -1
+                    if net_id != -1:
+                        if v.type == VertexType.INPUT:
+                            new_g = LogicGates.input_gate(v.name, net_id)
+                        else:
+                            new_g = LogicGates.output_gate(v.name, net_id)
+                        new_g.x_offset = g.x_offset
+                        bottom_gates[v_idx] = new_g
+
+            # Perform routing
+            channel_circuit = route_new(nets_input, top_gates, bottom_gates)
+            self.channels.append(ChannelWrapper(channel_circuit))
 
     def get_statistics(self):
         stats = {
@@ -238,141 +289,8 @@ class IntermediateCircuit:
         return stats
 
     def save_debug_svg(self, filename):
-        import xml.etree.ElementTree as ET
-
-        # Scaling factors
-        SCALE = 10
-        LAYER_GAP = 5
-        
-        # Calculate total dimensions
-        total_width = 0
-        total_height = 0
-        
-        layer_info = []
-        for i, layer in enumerate(self.gate_layers):
-            l_width = 0
-            l_height = 0
-            for g in layer:
-                w = g.x_offset + g.size_x
-                if w > l_width: l_width = w
-                if g.size_z > l_height: l_height = g.size_z
-            
-            chan_h = self.channels[i].size_z() if i < len(self.channels) else 0
-            layer_info.append({'w': l_width, 'h': l_height, 'ch': chan_h})
-            
-            if l_width > total_width: total_width = l_width
-            total_height += l_height + chan_h
-            
-        # Create SVG root
-        svg = ET.Element('svg', {
-            'xmlns': 'http://www.w3.org/2000/svg',
-            'width': str(total_width * SCALE),
-            'height': str(total_height * SCALE),
-            'viewBox': f"0 0 {total_width * SCALE} {total_height * SCALE}",
-            'style': 'background-color: #1e1e1e'
-        })
-        
-        # Define styles
-        style = ET.SubElement(svg, 'style')
-        style.text = """
-            .gate { fill: #333; stroke: #555; stroke-width: 0.5; }
-            .net { fill: none; stroke-width: 0.8; opacity: 0.7; }
-            .pin { r: 1.5; }
-            .text { font-family: sans-serif; font-size: 3px; fill: white; }
-            .net-label { font-size: 2px; }
-        """
-        
-        colors = ["#ff5555", "#55ff55", "#5555ff", "#ffff55", "#ff55ff", "#55ffff", "#ffb86c", "#bd93f9"]
-        
-        current_z = 0
-        for i, layer in enumerate(self.gate_layers):
-            info = layer_info[i]
-            
-            # Draw Gates
-            for idx, g in enumerate(layer):
-                v = self.vertex_layers[i][idx]
-                rect = ET.SubElement(svg, 'rect', {
-                    'x': str(g.x_offset * SCALE),
-                    'y': str(current_z * SCALE),
-                    'width': str(g.size_x * SCALE),
-                    'height': str(g.size_z * SCALE),
-                    'class': 'gate'
-                })
-                
-                # Label gate
-                name = getattr(v, 'name', 'relay')
-                if len(name) > 10: name = name[:8] + '..'
-                text = ET.SubElement(svg, 'text', {
-                    'x': str(g.x_offset * SCALE + 2),
-                    'y': str(current_z * SCALE + 5),
-                    'class': 'text'
-                })
-                text.text = f"{name} ({getattr(v, 'func_type', 'RELAY')})"
-
-            current_z += info['h']
-            
-            # Draw Channel Routing
-            if i < len(self.channels):
-                chan = self.channels[i]
-                all_nets = chan.straight_nets + [n for t in chan.tracks for n in t]
-                
-                for net in all_nets:
-                    color = colors[net.id % len(colors)]
-                    
-                    # Vertical from top pins to track
-                    for p in net.pins:
-                        if p.top:
-                            z_start = current_z - 0.5
-                            z_end = current_z + (net.track_z() / SCALE if net.track >= 0 else chan.size_z())
-                            ET.SubElement(svg, 'line', {
-                                'x1': str(p.x * SCALE + SCALE/2),
-                                'y1': str(z_start * SCALE),
-                                'x2': str(p.x * SCALE + SCALE/2),
-                                'y2': str(z_end * SCALE),
-                                'stroke': color,
-                                'class': 'net'
-                            })
-
-                    # Horizontal Track
-                    if net.track >= 0:
-                        tz = current_z + (net.track_z() / 1.0)
-                        ET.SubElement(svg, 'line', {
-                            'x1': str(net.x_min * SCALE + SCALE/2),
-                            'y1': str(tz * SCALE),
-                            'x2': str(net.x_max * SCALE + SCALE/2),
-                            'y2': str(tz * SCALE),
-                            'stroke': color,
-                            'class': 'net'
-                        })
-                        # Net ID Label
-                        t = ET.SubElement(svg, 'text', {
-                            'x': str(net.x_min * SCALE),
-                            'y': str(tz * SCALE - 1),
-                            'fill': color,
-                            'style': 'font-size: 4px'
-                        })
-                        t.text = f"N{net.id}"
-
-                    # Vertical to bottom pins
-                    for p in net.pins:
-                        if not p.top:
-                            z_start = current_z + (net.track_z() / 1.0 if net.track >= 0 else 0)
-                            z_end = current_z + info['ch']
-                            ET.SubElement(svg, 'line', {
-                                'x1': str(p.x * SCALE + SCALE/2),
-                                'y1': str(z_start * SCALE),
-                                'x2': str(p.x * SCALE + SCALE/2),
-                                'y2': str(z_end * SCALE),
-                                'stroke': color,
-                                'class': 'net'
-                            })
-                            
-                current_z += info['ch']
-
-        # Save to file
-        tree = ET.ElementTree(svg)
-        tree.write(filename)
-        print(f"Debug SVG saved to {filename}")
+        print("WARNING: save_debug_svg is currently disabled for the new router.")
+        pass
 
     def gen_circuit(self):
         size_x = 0
@@ -399,7 +317,7 @@ class IntermediateCircuit:
         
         for c in self.channels:
             if c.size_x() + 1 > size_x: size_x = c.size_x() + 1
-            size_z += c.size_z() + 1
+            size_z += c.size_z()
             
         circuit = Circuit(size_x, size_y, size_z)
         sources = [] # (pos, power, direction)

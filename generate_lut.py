@@ -1,9 +1,19 @@
 import mcschematic
-import sys
 import os
 import shutil
 
 def generate_lut(num_inputs, num_outputs, lut_data, filename="lut"):
+    # 0. Limits and Validation
+    if num_inputs > 4:
+        raise ValueError(f"Too many inputs: {num_inputs} (max 4)")
+    if num_outputs > 8:
+        raise ValueError(f"Too many outputs: {num_outputs} (max 8)")
+    if len(lut_data) != (1 << num_inputs):
+        raise ValueError(f"Data length mismatch: expected {1 << num_inputs}, got {len(lut_data)}")
+    for val in lut_data:
+        if val < 0 or val >= (1 << num_outputs):
+            raise ValueError(f"Data value {val} out of range for {num_outputs} outputs")
+
     schem = mcschematic.MCSchematic()
     
     BLUE = "minecraft:blue_wool"
@@ -83,9 +93,11 @@ def generate_lut(num_inputs, num_outputs, lut_data, filename="lut"):
 
 if __name__ == "__main__":
     #ni = 4; no = 4; data = [i for i in range(1 << ni)] # 1:1 mapping (identity function)
-    ni = 4; no = 4; data = [15 - i for i in range(1 << ni)] # 1:15 mapping (inverse identity function)
+    #ni = 4; no = 4; data = [15 - i for i in range(1 << ni)] # 1:15 mapping (inverse identity function)
 
     #ni = 4; no = 3; data = [bin(i).count('1') for i in range(1 << ni)] # Population Count (number of set bits)
+
+    ni = 2; no = 8; data = [0, 255, 128, 64]
     # "Interesting" mapping: Population Count (number of set bits)
     print(data)
     generate_lut(ni, no, data, "lut")
