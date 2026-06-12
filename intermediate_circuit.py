@@ -134,8 +134,11 @@ class IntermediateCircuit:
             tvl, tgl = self.vertex_layers[i], self.gate_layers[i]
             bvl, bgl = self.vertex_layers[i+1], self.gate_layers[i+1]
             def get_tx(v):
-                inps = [inp for inp in v.before if inp in gate_centers]
-                return sum(gate_centers[inp] for inp in inps) / len(inps) if inps else float('inf')
+                placed = []
+                for n in v.before + v.next:
+                    if n in gate_centers:
+                        placed.append(gate_centers[n])
+                return sum(placed) / len(placed) if placed else float('inf')
             comb = sorted(list(zip(bvl, bgl)), key=lambda p: get_tx(p[0]))
             self.vertex_layers[i+1], self.gate_layers[i+1] = [p[0] for p in comb], [p[1] for p in comb]
             bvl, bgl = self.vertex_layers[i+1], self.gate_layers[i+1]
@@ -146,7 +149,7 @@ class IntermediateCircuit:
                 if sx % 2 != 0: sx += 1
                 g.x_offset = sx
                 gate_centers[v] = sx + (g.size_x / 2)
-                ncx = sx + g.size_x + 3 # Space for backward jogs
+                ncx = sx + g.size_x + 1 # 1-block gap is sufficient
                 if ncx % 2 != 0: ncx += 1
 
         # Phase 2: Route channels
