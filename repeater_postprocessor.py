@@ -63,7 +63,7 @@ def get_connections(pos, state, block_map):
                     conns.append((d, -1))
     return conns
 
-def is_eligible(pos, block_map): # do not touch this, this is confiremed to be correct
+def is_eligible(pos, block_map):
     """
     Determines if a block is eligible for repeater placement.
     Requires exactly two opposite connections (straight line).
@@ -102,6 +102,39 @@ def is_eligible(pos, block_map): # do not touch this, this is confiremed to be c
             if "redstone_wire" not in nbid:
                 return False
                 
+    # Then check for potential shorts caused by powering adjacent nets through solid blocks
+    for d in [d1, d2]:
+        off = get_offset(d)
+        B = (pos[0] + off[0], pos[1], pos[2] + off[2])
+        state_B = block_map.get(B)
+        
+        def is_solid(state_str):
+            if not state_str: return False
+            b_id, _ = parse_state(state_str)
+            non_solids = ["air", "redstone_wire", "repeater", "torch", "lever", "sign"]
+            return not any(ns in b_id for ns in non_solids)
+            
+        if is_solid(state_B):
+            # Scan 5 sides of B (excluding Up and the source pos)
+            sides = [
+                (0, -1, 0),  # down
+                (0, 0, -1),  # north
+                (0, 0, 1),   # south
+                (1, 0, 0),   # east
+                (-1, 0, 0)   # west
+            ]
+            for ox, oy, oz in sides:
+                S_pos = (B[0] + ox, B[1] + oy, B[2] + oz)
+                if S_pos == pos:
+                    continue
+                state_S = block_map.get(S_pos)
+                if state_S and "redstone_wire" in state_S:
+                    # Check if there is a block on top of S_pos
+                    top_pos = (S_pos[0], S_pos[1] + 1, S_pos[2])
+                    state_top = block_map.get(top_pos)
+                    if state_top and "air" not in state_top:
+                        return False
+                        
     # if no check failed return true
     return True
 

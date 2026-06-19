@@ -2,6 +2,13 @@ from netlist_parser import VertexType, Vertex, Graph
 from router import route as route_new
 from logic_gates import LogicGates, Circuit
 
+def parallel_route_worker(nets_in, tgl, bgl, ncx, channel_idx):
+    if nets_in:
+        from router import route as route_new
+        return route_new(nets_in, tgl, bgl)
+    else:
+        return Circuit(ncx, 3, 1)
+
 class ChannelWrapper:
     def __init__(self, circuit):
         self.circuit = circuit
@@ -152,9 +159,11 @@ class IntermediateCircuit:
                 ncx = sx + g.size_x + 1 # 1-block gap is sufficient
                 if ncx % 2 != 0: ncx += 1
 
-        # Phase 2: Route channels
+        # Phase 2: Pre-calculate routing inputs sequentially
         num_channels = len(self.vertex_layers) - 1
         v_in_ptr = {v: 0 for layer in self.vertex_layers for v in layer}
+        
+        routing_jobs = []
 
         for i in range(num_channels):
             tvl, tgl = self.vertex_layers[i], self.gate_layers[i]
@@ -213,17 +222,27 @@ class IntermediateCircuit:
                     if net:
                         nets_in.append(net)
 
-            print(f"DEBUG: Channel {i} routing between Layer {i} and Layer {i+1}:")
-            print(f"  Nets for router: {nets_in}")
-
             ncx = 0
             for g in tgl: ncx = max(ncx, g.x_offset + g.size_x)
             for g in bgl: ncx = max(ncx, g.x_offset + g.size_x)
 
-            if nets_in:
-                self.channels.append(ChannelWrapper(route_new(nets_in, tgl, bgl)))
-            else:
-                self.channels.append(ChannelWrapper(Circuit(ncx, 3, 1)))
+            routing_jobs.append((nets_in, tgl, bgl, ncx, i))
+
+        # Phase 3: Route channels in parallel using ProcessPoolExecutor
+        from concurrent.futures import ProcessPoolExecutor
+        results = [None] * len(routing_jobs)
+        
+        with ProcessPoolExecutor() as executor:
+            futures = {
+                executor.submit(parallel_route_worker, nets_in, tgl, bgl, ncx, i): i
+                for nets_in, tgl, bgl, ncx, i in routing_jobs
+            }
+            for future in futures:
+                i = futures[future]
+                results[i] = future.result()
+
+        for circuit in results:
+            self.channels.append(ChannelWrapper(circuit))
 
     def get_statistics(self):
         stats = {"gate_counts": {}, "total_gates": 0, "max_delay": len(self.vertex_layers)}
