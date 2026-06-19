@@ -167,11 +167,18 @@ def test_router():
     # 5. Create Schematic
     schem = mcschematic.MCSchematic()
     
-    width = circuit.size_x
+    # Calculate bounding box of all occupied elements (blocks + pins + signs)
     length = circuit.size_z
-    
-    for x in range(-2, width + 4):
-        for z in range(-1, length + 1):
+    min_x = min(x for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+    max_x = max(x for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+    for pin_list in nets:
+        for px, py, is_top in pin_list:
+            min_x = min(min_x, px)
+            max_x = max(max_x, px)
+            
+    # Platform spans from min_x - 1 to max_x + 1 horizontally, and z from -1 to length
+    for z in range(-1, length + 1):
+        for x in range(min_x - 1, max_x + 2):
             schem.setBlock((x, 0, z), "minecraft:stone_bricks")
             
     # Mark all pin locations and add signs

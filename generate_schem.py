@@ -131,9 +131,14 @@ def generate_circuit_schematic(json_filepath, filename):
 
     schem = mcschematic.MCSchematic()
     
-    # Place stone brick base
-    for z in range(-1, circuit.size_z + 1):
-        for x in range(-1, circuit.size_x + 1):
+    # Place stone brick base covering the bounding box of the circuit + 1 padding
+    min_x = min(x for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+    max_x = max(x for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+    min_z = min(z for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+    max_z = max(z for (x, y, z) in circuit.blocks.keys()) if circuit.blocks else 0
+
+    for z in range(min_z - 1, max_z + 2):
+        for x in range(min_x - 1, max_x + 2):
             schem.setBlock((x, -1, z), "minecraft:stone_bricks")
             
     # Place all blocks

@@ -50,18 +50,49 @@ class IntermediateCircuit:
                 self.vertex_layers[last_idx].append(v)
                 self.v_to_layer[v] = last_idx
 
+        # Optimize layers with only 1 real gate by pushing them to adjacent layers
+        for i in range(1, len(self.vertex_layers) - 1):
+            layer = self.vertex_layers[i]
+            if len(layer) == 1:
+                v = layer[0]
+                if v.type not in [VertexType.INPUT, VertexType.OUTPUT]:
+                    target_layer_idx = i - 1
+                    if target_layer_idx == 0:
+                        target_layer_idx = i + 1
+                    if target_layer_idx < len(self.vertex_layers) - 1:
+                        print(f"Optimization: Pushing single real gate {v.name} from layer {i} to layer {target_layer_idx}")
+                        self.vertex_layers[target_layer_idx].append(v)
+                        self.v_to_layer[v] = target_layer_idx
+                        self.vertex_layers[i] = []
+
+        # Remove empty layers and adjust layer indices
+        new_vertex_layers = []
+        for idx, layer in enumerate(self.vertex_layers):
+            if idx == 0 or idx == len(self.vertex_layers) - 1 or len(layer) > 0:
+                new_vertex_layers.append(layer)
+        
+        self.vertex_layers = new_vertex_layers
+        self.v_to_layer = {}
+        for l_idx, layer in enumerate(self.vertex_layers):
+            for v in layer:
+                self.v_to_layer[v] = l_idx
+
         relay_count = 0
-        edges = []
-        for v in vertices:
-            for n in list(v.next):
-                edges.append((v, n))
-
-        for u, v in edges:
-            ul, vl = self.v_to_layer[u], self.v_to_layer[v]
-
-            if vl <= ul:
-                # Backward or Same-layer edge!
-                # We need a chain of relays at layers ul, ul-1, ..., vl
+        for u in vertices:
+            ul = self.v_to_layer[u]
+            forward_dests = []
+            backward_dests = []
+            
+            for v in list(u.next):
+                vl = self.v_to_layer[v]
+                if vl <= ul:
+                    backward_dests.append(v)
+                elif vl > ul + 1:
+                    forward_dests.append(v)
+            
+            # 1. Process backward/same-layer edges (processed individually as before)
+            for v in backward_dests:
+                vl = self.v_to_layer[v]
                 prev = u
                 for r_layer in range(ul, vl - 1, -1):
                     relay = Vertex(f"relay_backward_{relay_count}", VertexType.FUNCTION, func_type="RELAY")
@@ -75,15 +106,15 @@ class IntermediateCircuit:
                 
                 prev.add_next(v)
                 v.add_before(prev)
-                
                 u.next.remove(v)
                 v.before.remove(u)
-
-            elif vl > ul + 1:
-                # Forward edge spanning multiple layers
-                # We need a chain of relays at layers ul+1, ul+2, ..., vl-1
+            
+            # 2. Process forward edges (shared relays for all forward destinations from u)
+            if forward_dests:
+                max_vl = max(self.v_to_layer[v] for v in forward_dests)
+                relays = {}
                 prev = u
-                for r_layer in range(ul + 1, vl):
+                for r_layer in range(ul + 1, max_vl):
                     relay = Vertex(f"relay_forward_{relay_count}", VertexType.FUNCTION, func_type="RELAY")
                     relay_count += 1
                     self.vertex_layers[r_layer].append(relay)
@@ -91,13 +122,19 @@ class IntermediateCircuit:
                     
                     prev.add_next(relay)
                     relay.add_before(prev)
+                    
+                    relays[r_layer] = relay
                     prev = relay
                 
-                prev.add_next(v)
-                v.add_before(prev)
-                
-                u.next.remove(v)
-                v.before.remove(u)
+                # Redirect destinations to use the appropriate relay in the shared chain
+                for v in forward_dests:
+                    vl = self.v_to_layer[v]
+                    source_relay = relays[vl - 1]
+                    source_relay.add_next(v)
+                    v.add_before(source_relay)
+                    
+                    u.next.remove(v)
+                    v.before.remove(u)
 
     def build_gates(self):
         for layer in self.vertex_layers:
@@ -128,6 +165,48 @@ class IntermediateCircuit:
         return [g.x_offset + (i * (1 + spc)) for i in range(cnt)]
 
     def route_channels(self):
+        # 1. Multi-pass barycenter sweep to minimize crossing connections (Sugiyama method)
+        num_layers = len(self.vertex_layers)
+        num_sweeps = 12
+
+        for sweep in range(num_sweeps):
+            # Forward sweep: sort layer i based on connections to layer i-1 (exclude last layer)
+            for i in range(1, num_layers - 1):
+                prev_layer = self.vertex_layers[i - 1]
+                prev_indices = {v: idx for idx, v in enumerate(prev_layer)}
+                current_indices = {v: idx for idx, v in enumerate(self.vertex_layers[i])}
+                
+                def get_prev_barycenter(item):
+                    v, _ = item
+                    connected = [prev_indices[u] for u in v.before if u in prev_indices]
+                    if not connected:
+                        return current_indices[v]
+                    return sum(connected) / len(connected)
+                
+                zipped = list(zip(self.vertex_layers[i], self.gate_layers[i]))
+                zipped.sort(key=get_prev_barycenter)
+                self.vertex_layers[i] = [v for v, g in zipped]
+                self.gate_layers[i] = [g for v, g in zipped]
+                
+            # Backward sweep: sort layer i based on connections to layer i+1 (exclude first layer)
+            for i in range(num_layers - 2, 0, -1):
+                next_layer = self.vertex_layers[i + 1]
+                next_indices = {v: idx for idx, v in enumerate(next_layer)}
+                current_indices = {v: idx for idx, v in enumerate(self.vertex_layers[i])}
+                
+                def get_next_barycenter(item):
+                    v, _ = item
+                    connected = [next_indices[w] for w in v.next if w in next_indices]
+                    if not connected:
+                        return current_indices[v]
+                    return sum(connected) / len(connected)
+                
+                zipped = list(zip(self.vertex_layers[i], self.gate_layers[i]))
+                zipped.sort(key=get_next_barycenter)
+                self.vertex_layers[i] = [v for v, g in zipped]
+                self.gate_layers[i] = [g for v, g in zipped]
+
+        # 2. Assign horizontal gate offsets
         gate_centers = {}
         cx = 0
         for i, v in enumerate(self.vertex_layers[0]):
@@ -268,8 +347,10 @@ class IntermediateCircuit:
         circ, sources, gr, zoff = Circuit(sx, sy, sz), [], set(), 0
         for i, layer in enumerate(self.gate_layers):
             # Place brick floor under the gate layer
+            min_x_layer = min(g.x_offset for g in layer) if layer else 0
+            max_x_layer = max(g.x_offset + g.size_x for g in layer) if layer else sx
             for lz_idx in range(lz[i]):
-                for lx_idx in range(sx):
+                for lx_idx in range(min_x_layer, max_x_layer):
                     circ.set_block(lx_idx, -1, zoff + lz_idx, "minecraft:bricks")
                     
             for j, g in enumerate(layer):

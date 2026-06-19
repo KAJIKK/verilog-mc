@@ -1,10 +1,6 @@
 import mcschematic
 import re
 from collections import deque
-try:
-    import pygame
-except ImportError:
-    pygame = None
 import sys
 import nbtlib
 import os
@@ -406,103 +402,6 @@ def build_graph(block_map, sources):
                         final_graph[p]['connections'].append(c)
 
     return final_graph, global_repeaters
-
-def draw_arrow(screen, color, rect, direction):
-    """
-    Draws a directional arrow inside a cell to indicate repeater orientation.
-    """
-    # Directions: north, south, east, west
-    cx, cy = rect.center
-    s = rect.width // 4
-    if direction == "north":
-        pts = [(cx, cy + s), (cx - s, cy - s), (cx + s, cy - s)]
-    elif direction == "south":
-        pts = [(cx, cy - s), (cx - s, cy + s), (cx + s, cy + s)]
-    elif direction == "east":
-        pts = [(cx - s, cy), (cx + s, cy - s), (cx + s, cy + s)]
-    elif direction == "west":
-        pts = [(cx + s, cy), (cx - s, cy - s), (cx - s, cy + s)]
-    else:
-        return
-    pygame.draw.polygon(screen, color, pts)
-
-def render_layer(width, height, length, initial_layer, block_map, visited, repeaters, graph=None):
-    """
-    Initializes and runs the Pygame visualization loop.
-    Allows navigating layers with UP/DOWN and prints coordinates on click.
-    """
-    pygame.init()
-    cell_size = 40
-    screen = pygame.display.set_mode((width * cell_size, length * cell_size))
-    font = pygame.font.SysFont("Arial", 12)
-    
-    layer_idx = initial_layer
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    layer_idx = min(height - 1, layer_idx + 1)
-                elif event.key == pygame.K_DOWN:
-                    layer_idx = max(0, layer_idx - 1)
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mx, my = pygame.mouse.get_pos()
-                gx, gz = mx // cell_size, my // cell_size
-                if 0 <= gx < width and 0 <= gz < length:
-                    print(f"Clicked Block: ({gx}, {layer_idx}, {gz})")
-        
-        pygame.display.set_caption(f"Layer {layer_idx} / {height-1}")
-        screen.fill((30, 30, 30))
-        for z in range(length):
-            for x in range(width):
-                pos = (x, layer_idx, z)
-                state = block_map.get(pos, "air")
-                bid, _ = parse_state(state)
-                
-                rect = pygame.Rect(x * cell_size, z * cell_size, cell_size - 1, cell_size - 1)
-                color = (50, 50, 50)
-                
-                if pos in repeaters:
-                    color = (0, 255, 0)
-                elif "redstone_wire" in bid:
-                    power = visited.get(pos, None)
-                    if power is None:
-                        color = (0, 0, 0)
-                    elif power > 0:
-                        intensity = int(max(0, min(255, (power / 15.0) * 255)))
-                        color = (intensity, 0, 0)
-                    else: # power <= 0
-                        intensity = int(max(0, min(255, (abs(power) / 15.0) * 255)))
-                        color = (0, 0, intensity)
-                elif "lever" in bid:
-                    color = (200, 200, 0)
-                elif "air" not in bid:
-                    color = (100, 100, 100)
-                
-                pygame.draw.rect(screen, color, rect)
-                
-                if graph and pos in graph:
-                    node = graph[pos]
-                    if node['is_eligible']:
-                        pygame.draw.rect(screen, (255, 255, 0), rect, 2)
-                    for npos in node['connections']:
-                        if npos[1] == layer_idx:
-                            start_center = (x * cell_size + cell_size // 2, z * cell_size + cell_size // 2)
-                            end_center = (npos[0] * cell_size + cell_size // 2, npos[2] * cell_size + cell_size // 2)
-                            pygame.draw.line(screen, (255, 150, 150), start_center, end_center, 2)
-                
-                if pos in repeaters:
-                    draw_arrow(screen, (0, 100, 0), rect, repeaters[pos])
-                
-                p_val = 0 if pos in repeaters else visited.get(pos, None)
-                if p_val is not None:
-                    txt = font.render(str(p_val), True, (255, 255, 255))
-                    screen.blit(txt, (x * cell_size + 2, z * cell_size + 2))
-        
-        pygame.display.flip()
-    pygame.quit()
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

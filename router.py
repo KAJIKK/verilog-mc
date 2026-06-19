@@ -7,7 +7,7 @@ BASE_STEP_COST = 1.0               # Cost of moving along the X axis
 Z_STEP_COST = 5.0                  # Cost of moving along the Z axis (channel length direction)
 BEND_PENALTY = 2.0
 VERTICAL_STEP_PENALTY = 10.0       # Penalty for changing Y-level (climb/descend)
-HEIGHT_PENALTY_MULTIPLIER = 2.0   # Multiplier applied to Y level to keep paths on the floor (Y=0)
+HEIGHT_PENALTY_MULTIPLIER = 3.0   # Multiplier applied to Y level to keep paths on the floor (Y=0)
 
 
 
