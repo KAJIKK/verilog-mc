@@ -3,6 +3,7 @@
 # Whitelist Python files and specific config files
 !*.py
 !**/*.py
+!tests
 !.gitignore
 !Makefile
 !*.lib

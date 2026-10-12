@@ -38,6 +38,30 @@ def generate(schematic, origin, destination):
     def write(name, commands):
         (functions / f"{name}.mcfunction").write_text("\n".join(commands) + "\n")
 
+    # Optional exact-origin placement, independent of the player's movement.
+    # Existing WorldEdit workflows still call start after their own paste.
+    states = {p:structure.getBlockStateAt(p) for p in structure.getBlockStates()}
+    low = tuple(min(p[axis] for p in states) for axis in range(3))
+    high = tuple(max(p[axis] for p in states) for axis in range(3))
+    def world_pos(p):
+        return ' '.join(str(a+b) for a,b in zip(p,origin))
+    slab = max(1,32768 // ((high[0]-low[0]+1)*(high[2]-low[2]+1)))
+    placement = [f'fill {world_pos((low[0],y,low[2]))} '
+                 f'{world_pos((high[0],min(y+slab-1,high[1]),high[2]))} air'
+                 for y in range(low[1],high[1]+1,slab)]
+    def rank(item):
+        state = item[1]
+        return (2 if 'redstone_wire' in state else
+                1 if any(name in state for name in ('repeater','comparator','torch','sign','lever')) else 0,
+                -item[0][1],-item[0][2],item[0][0])
+    for p,state in sorted(states.items(),key=rank):
+        if state.split('[',1)[0] in ('minecraft:air','minecraft:cave_air','minecraft:void_air'):
+            continue
+        data = structure.getBlockDataAt(p) if 'sign' in state else ''
+        # mcschematic returns the complete block specification, not just NBT.
+        placement.append(f'setblock {world_pos(p)} {data or state}')
+    write('place',placement)
+
     write("start", [
         "schedule clear adder4_test:check",
         "scoreboard objectives add adder4_test dummy",

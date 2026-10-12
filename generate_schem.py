@@ -119,15 +119,10 @@ def generate_circuit_schematic(json_filepath, filename):
     # Resolve bare wires to have properties for the postprocessor
     resolved_map = resolve_redstone_wires(block_map)
 
-    try:
-        _, repeaters = build_graph(resolved_map, sources)
-        print(f"Postprocessor placed {len(repeaters)} repeaters.")
-        # Apply repeaters to the circuit
-        for pos, direction in repeaters.items():
-            circuit.set_block(pos[0], pos[1], pos[2], f"minecraft:repeater[facing={direction}]")
-    except Exception as e:
-        print(f"WARNING: Repeater placement postprocessor failed: {e}")
-        print("Falling back to bare redstone wires.")
+    _, repeaters = build_graph(resolved_map, sources)
+    print(f"Postprocessor placed {len(repeaters)} repeaters.")
+    for pos, direction in repeaters.items():
+        circuit.set_block(pos[0], pos[1], pos[2], f"minecraft:repeater[facing={direction}]")
 
     schem = mcschematic.MCSchematic()
     

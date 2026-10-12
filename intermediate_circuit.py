@@ -2,12 +2,17 @@ from netlist_parser import VertexType, Vertex, Graph
 from router import route as route_new
 from logic_gates import LogicGates, Circuit
 
-def parallel_route_worker(nets_in, tgl, bgl, ncx, channel_idx):
+def parallel_route_worker(nets_in, tgl, bgl, ncx, channel_idx, pin_headroom=()):
+    from time import perf_counter
+    started = perf_counter()
     if nets_in:
         from router import route as route_new
-        return route_new(nets_in, tgl, bgl)
+        circuit = route_new(nets_in, min_width=max(1,ncx), pin_headroom=pin_headroom)
     else:
-        return Circuit(ncx, 3, 1)
+        circuit = Circuit(ncx, 3, 1)
+        circuit.route_stats = {'attempts': 0}
+    circuit.route_stats['seconds'] = perf_counter() - started
+    return circuit
 
 class ChannelWrapper:
     def __init__(self, circuit):
@@ -188,23 +193,19 @@ class IntermediateCircuit:
             raise ValueError(f"Unsupported storage cell {v.func_type}; use a positive-enable D latch or an explicit MC_SR_LATCH/MC_T_LATCH")
         return LogicGates.relay()
 
-    def _get_pins(self, v, g, as_out):
-        off = (getattr(g, 'output_offsets', None) if as_out else getattr(g, 'input_offsets', None))
-        if off:
-            if isinstance(off, dict): off = list(off.values())
-            return [g.x_offset + x for x in off]
-        cnt = (getattr(g, 'num_outputs', 1) if as_out else getattr(g, 'num_inputs', 1))
-        spc = (getattr(g, 'output_spacing', 1) if as_out else getattr(g, 'input_spacing', 1))
-        return [g.x_offset + (i * (1 + spc)) for i in range(cnt)]
+    def _get_pins(self, v, g, as_out, with_height=False):
+        positions = [(g.x_offset + x, y) for x, y in g.pin_positions(as_out)]
+        return positions if with_height else [x for x, y in positions]
 
-    def _input_pins_for_source(self, v, g, source, pointers):
+    def _input_pins_for_source(self, v, g, source, pointers, with_height=False):
         """Named pins must follow Yosys port roles, not placement order."""
         if isinstance(g.input_offsets, dict):
             source_bits = getattr(source, 'bits', [])
-            return [g.x_offset + offset
-                    for port, offset in g.input_offsets.items()
+            pins = self._get_pins(v, g, False, with_height)
+            return [pin
+                    for (port, offset), pin in zip(g.input_offsets.items(), pins)
                     if any(bit in source_bits for bit in v.input_bits.get(port, []))]
-        pins = self._get_pins(v, g, False)
+        pins = self._get_pins(v, g, False, with_height)
         wanted = getattr(v, 'bits', []) if v.type == VertexType.OUTPUT or getattr(v, 'func_type', '') == 'RELAY' else [bit for bits in getattr(v, 'input_bits', {}).values() for bit in bits]
         if wanted and not set(wanted).intersection(getattr(source, 'bits', [])):
             return []
@@ -214,15 +215,16 @@ class IntermediateCircuit:
         pointers[v] += 1
         return [pins[ptr]]
 
-    def _output_sources(self, v, g):
+    def _output_sources(self, v, g, with_height=False):
         """Associate each physical output with its own signal, including Q/QN."""
         if isinstance(g.output_offsets, dict) and getattr(v, 'output_bits', None):
-            return [(g.x_offset + offset,
+            pins = self._get_pins(v, g, True, with_height)
+            return [(pin,
                      Vertex(v.name, v.type, bits=v.output_bits.get(port, [])))
-                    for port, offset in g.output_offsets.items()]
-        return [(pin, v) for pin in self._get_pins(v, g, True)]
+                    for (port, offset), pin in zip(g.output_offsets.items(), pins)]
+        return [(pin, v) for pin in self._get_pins(v, g, True, with_height)]
 
-    def route_channels(self):
+    def route_channels(self, workers=None):
         # 1. Multi-pass barycenter sweep to minimize crossing connections (Sugiyama method)
         num_layers = len(self.vertex_layers)
         num_sweeps = 12
@@ -309,39 +311,39 @@ class IntermediateCircuit:
 
             # 1. Nets from tvl
             for ui, u in enumerate(tvl):
-                for ox, source in self._output_sources(u, tgl[ui]):
-                    net = [(ox, 0, True)]
+                for (ox, oy), source in self._output_sources(u, tgl[ui], True):
+                    net = [(ox, oy, True)]
                     for v in u.next:
                         if v in bvl: # Forward target
                             vi = bvl.index(v)
-                            for ix in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr):
-                                net.append((ix, 0, False))
+                            for ix, iy in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr, True):
+                                net.append((ix, iy, False))
                         elif v in tvl: # Same-layer target (only if target is RELAY)
                             if getattr(v, 'func_type', '') == 'RELAY':
                                 vi = tvl.index(v)
-                                for ix in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr):
-                                    net.append((ix, 0, True))
+                                for ix, iy in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr, True):
+                                    net.append((ix, iy, True))
                     if len(net) > 1:
                         nets_in.append(net)
 
             # 2. Nets from bvl
             for ui, u in enumerate(bvl):
-                for ox, source in self._output_sources(u, bgl[ui]):
+                for (ox, oy), source in self._output_sources(u, bgl[ui], True):
                     net = []
                     for v in u.next:
                         if v in tvl: # Backward target
                             vi = tvl.index(v)
-                            for ix in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr):
+                            for ix, iy in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr, True):
                                 if not net:
-                                    net.append((ox, 0, False))
-                                net.append((ix, 0, True))
+                                    net.append((ox, oy, False))
+                                net.append((ix, iy, True))
                         elif v in bvl: # Same-layer target (only if source u is RELAY)
                             if getattr(u, 'func_type', '') == 'RELAY':
                                 vi = bvl.index(v)
-                                for ix in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr):
+                                for ix, iy in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr, True):
                                     if not net:
-                                        net.append((ox, 0, False))
-                                    net.append((ix, 0, False))
+                                        net.append((ox, oy, False))
+                                    net.append((ix, iy, False))
                     if net:
                         nets_in.append(net)
 
@@ -349,20 +351,54 @@ class IntermediateCircuit:
             for g in tgl: ncx = max(ncx, g.x_offset + g.size_x)
             for g in bgl: ncx = max(ncx, g.x_offset + g.size_x)
 
-            routing_jobs.append((nets_in, tgl, bgl, ncx, i))
+            # A wool port sometimes emits through dust above it, so the first
+            # external wire descends from inside the gate. Preserve THAT pin's
+            # headroom even though ordinary flat ports can be covered.
+            pin_headroom = set()
+            actual_pins = {p for net in nets_in for p in net}
+            top_depth = max((g.size_z for g in tgl),default=0)
+            for vertices,gates,is_top in ((tvl,tgl,True),(bvl,bgl,False)):
+                for v,g in zip(vertices,gates):
+                    if is_top and g.size_z != top_depth:
+                        continue # The first descending wire is a gate-row extension.
+                    edge = g.size_z-1 if is_top else 0
+                    for as_out in (False,True):
+                        for x,y in self._get_pins(v,g,as_out,True):
+                            pin = (x,y,is_top)
+                            if pin in actual_pins and 'redstone_wire' in g.blocks.get((x-g.x_offset,y+1,edge),''):
+                                pin_headroom.add(pin)
+
+            # Only net coordinates and row width are needed by workers;
+            # avoid serializing complete gate blueprints for every channel.
+            routing_jobs.append((nets_in, None, None, ncx, i, pin_headroom))
 
         # Phase 3: Route channels in parallel using ProcessPoolExecutor
-        from concurrent.futures import ProcessPoolExecutor
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        from os import cpu_count
         results = [None] * len(routing_jobs)
-        
-        with ProcessPoolExecutor() as executor:
-            futures = {
-                executor.submit(parallel_route_worker, nets_in, tgl, bgl, ncx, i): i
-                for nets_in, tgl, bgl, ncx, i in routing_jobs
-            }
-            for future in futures:
-                i = futures[future]
-                results[i] = future.result()
+        if workers is not None and (type(workers) is not int or workers < 1):
+            raise ValueError('workers must be a positive integer')
+        worker_count = min(len(routing_jobs), workers or cpu_count() or 1)
+        def completed(index, circuit):
+            results[index] = circuit
+            print(f'  Channel {index+1}/{num_channels}: '
+                  f'{circuit.size_x}x{circuit.size_y}x{circuit.size_z}, '
+                  f'{circuit.route_stats["seconds"]:.3f}s, '
+                  f'{circuit.route_stats["attempts"]} attempts', flush=True)
+        if routing_jobs:
+            print(f'Routing {num_channels} channels with {worker_count} worker(s)...', flush=True)
+        if worker_count == 1:
+            for i, job in enumerate(routing_jobs):
+                completed(i, parallel_route_worker(*job))
+        elif routing_jobs:
+            with ProcessPoolExecutor(max_workers=worker_count) as executor:
+                futures = {
+                    executor.submit(parallel_route_worker, *job): job[4]
+                    for job in routing_jobs
+                }
+                for future in as_completed(futures):
+                    i = futures[future]
+                    completed(i, future.result())
 
         for circuit in results:
             self.channels.append(ChannelWrapper(circuit))
@@ -387,8 +423,9 @@ class IntermediateCircuit:
             sx, sy = max(sx, glx), max(sy, gly)
             sz += glz; lz.append(glz)
         for c in self.channels:
-            sx = max(sx, c.size_x()); sz += c.size_z()
+            sx = max(sx, c.size_x()); sy = max(sy, c.circuit.size_y); sz += c.size_z()
         circ, sources, gr, zoff = Circuit(sx, sy, sz), [], set(), 0
+        required_air = set()
         for i, layer in enumerate(self.gate_layers):
             # Place brick floor under the gate layer
             min_x_layer = min(g.x_offset for g in layer) if layer else 0
@@ -402,16 +439,25 @@ class IntermediateCircuit:
                 for (lx, ly, lz_pos), b in g.blocks.items():
                     circ.set_block(g.x_offset + lx, ly, zoff + lz_pos, b)
                     if "repeater" in b: gr.add((g.x_offset + lx, ly, zoff + lz_pos))
-                oxs = self._get_pins(v, g, True)
-                for ptr, ox in enumerate(oxs):
-                    for z in range(g.size_z, lz[i]): circ.set_block(ox, 0, zoff + z, "minecraft:redstone_wire")
+                outputs = self._get_pins(v, g, True, True)
+                for ox, oy in outputs:
+                    if g.size_z < lz[i] and 'redstone_wire' in g.blocks.get((ox-g.x_offset,oy+1,g.size_z-1),''):
+                        required_air.add((ox,oy+1,zoff+g.size_z))
+                    for z in range(g.size_z, lz[i]):
+                        circ.set_block(ox, oy-1, zoff + z, "minecraft:white_wool")
+                        circ.set_block(ox, oy, zoff + z, "minecraft:redstone_wire")
                 if v.type == VertexType.INPUT or (v.type == VertexType.FUNCTION and getattr(v, 'func_type', '') != 'RELAY'):
-                    outs = getattr(g, 'output_offsets', None) or [0]
-                    if isinstance(outs, dict): outs = list(outs.values())
-                    for o in outs: sources.append(((g.x_offset + o, 0, zoff + g.size_z), 15, "south"))
+                    for ox, oy in outputs:
+                        sources.append(((ox, oy, zoff + g.size_z), 15, "south"))
             zoff += lz[i]
             if i < len(self.gate_layers) - 1:
                 c = self.channels[i]
                 for (cx, cy, cz), b in c.gen_channel_circuit().blocks.items(): circ.set_block(cx, cy, zoff + cz, b)
+                required_air.update((cx,cy,zoff+cz) for cx,cy,cz in getattr(c.circuit,'required_air',()))
                 zoff += c.size_z()
+        from router import AIR_BLOCKS
+        blocked = [p for p in required_air if circ.blocks.get(p,'minecraft:air').split('[',1)[0] not in AIR_BLOCKS]
+        if blocked:
+            raise ValueError(f'A block/support cuts routed or gate-port headroom at {sorted(blocked)}')
+        circ.required_air = required_air
         return circ, sources, gr

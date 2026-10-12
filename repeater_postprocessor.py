@@ -86,7 +86,7 @@ def is_eligible(pos, block_map):
     for d in [d1, d2]:
         val = props.get(d)
         if val == "up":
-            continue # it's good and go to the other one
+            return False # Repeaters cannot climb or descend like dust.
         elif val == "side":
             # check the block next to it
             off = get_offset(d)
@@ -260,148 +260,94 @@ def get_downstream(start_node, graph):
     return downstream
 
 def build_graph(block_map, sources):
-    """
-    Builds a directed graph representing redstone flow from sources.
-    Uses BFS to track power, backtracks to place repeaters when power hits 0.
+    """Restore long lines with directional repeaters on flat straight dust.
+
+    Rebuild power after each placement rather than resetting an undirected
+    downstream graph (which could reset its own repeater and loop forever).
+    A line without a reachable legal repeater site is an explicit error.
     """
     print(f"Building graphs for {len(sources)} sources...")
-    final_graph = {}
-    global_repeaters = {}
-    processed_count = 0
+    directions = {name: get_offset(get_opposite(name)) for name in ('north', 'south', 'east', 'west')}
+    signals = {}
+    for pos, block in block_map.items():
+        bid, props = parse_state(block)
+        if bid == 'minecraft:redstone_wire':
+            signals[pos] = None
+        elif bid == 'minecraft:repeater':
+            dx, _, dz = directions[props.get('facing', 'north')]
+            signals[pos] = (dx, dz)
+    solids = {pos for pos, block in block_map.items() if pos not in signals and
+              not any(name in block for name in ('air', 'torch', 'lever', 'sign'))}
+    from redstone_geometry import signal_neighbors, signal_powers, FACING
 
-    for i, source in enumerate(sources):
-        src_pos, _, _ = source
-        print(f"Processing source {i+1}/{len(sources)} at {src_pos}")
-        
-        # Local graph for this source
-        graph = {}
-        queue = deque()
-        
-        graph[src_pos] = {
-            'pos': src_pos,
-            'is_eligible': is_eligible(src_pos, block_map),
-            'connections': [],
-            'power': 15
-        }
-        queue.append((src_pos, 15, [src_pos]))
-        
+    def topology(source):
+        parents = {source: None}
+        queue = deque([source])
         while queue:
-            pos, power, path = queue.popleft()
-            processed_count += 1
+            pos = queue.popleft()
+            for neighbor in signal_neighbors(pos, signals, solids):
+                if neighbor not in parents:
+                    parents[neighbor] = pos
+                    queue.append(neighbor)
+        return parents
 
-            state = block_map.get(pos)
-            if not state: continue
-            
-            if power < graph[pos]['power']:
-                continue
-                
-            if power == 0:
-                # Backtrack to find repeater placement using scoring
-                best_score = -1
-                best_rp = None
-                best_dir = None
-                
-                for j in range(len(path) - 1, -1, -1):
-                    rp = path[j]
-                    if is_eligible(rp, block_map):
-                        # Determine direction
-                        dx, dz = 0, 0
-                        if j + 1 < len(path):
-                            next_p = path[j+1]
-                            dx, dz = next_p[0] - rp[0], next_p[2] - rp[2]
-                        elif j > 0:
-                            prev_p = path[j-1]
-                            dx, dz = rp[0] - prev_p[0], rp[2] - prev_p[2]
-                            
-                        direction = None
-                        if dx == 1: direction = "west"
-                        elif dx == -1: direction = "east"
-                        elif dz == 1: direction = "north"
-                        elif dz == -1: direction = "south"
-                        
-                        if direction:
-                            # Reuse existing global repeater if possible
-                            if rp in global_repeaters and global_repeaters[rp] == direction:
-                                best_rp, best_dir, best_score = rp, direction, float('inf')
-                                break
-                                
-                            if rp not in global_repeaters:
-                                test_repeaters = global_repeaters.copy()
-                                test_repeaters[rp] = direction
-                                # Evaluate score ONLY for this source
-                                score = get_score(block_map, [source], test_repeaters)
-                                
-                                if score > best_score:
-                                    best_score, best_rp, best_dir = score, rp, direction
-                                elif score < best_score and best_score != -1:
-                                    # Optimization: score usually increases then decreases as we backtrack
-                                    break
-                                    
-                if best_rp:
-                    global_repeaters[best_rp] = best_dir
-                    graph[best_rp]['power'] = 15
-                    
-                    # Reset downstream in the local graph
-                    downstream = get_downstream(best_rp, graph)
-                    for d_pos in downstream:
-                        if d_pos in graph:
-                            graph[d_pos]['power'] = -1
-                            graph[d_pos]['connections'] = []
-                    
-                    # Clean main queue of downstream nodes
-                    new_queue = deque()
-                    for q_pos, q_pwr, q_path in queue:
-                        if q_pos not in downstream:
-                            new_queue.append((q_pos, q_pwr, q_path))
-                    queue = new_queue
-                    
-                    queue.append((best_rp, 15, [best_rp]))
+    repeaters = {}
+    source_positions = {pos for pos, _, _ in sources}
+    required = {}
+    for pos, _, _ in sources:
+        if pos in signals:
+            required[pos] = set(topology(pos))
+    for index, (source, source_power, _) in enumerate(sources):
+        print(f"Processing source {index+1}/{len(sources)} at {source}")
+        if source not in signals:
+            continue
+        # Every iteration must add a distinct repeater: finite even for loops.
+        for _ in range(len(signals) + 1):
+            parents = topology(source)
+            powers = signal_powers(signals, solids, source, source_power)
+            if not required[source].issubset(parents):
+                raise ValueError(f'Repeater direction disconnected a branch from {source}')
+            unpowered = [pos for pos in parents if powers.get(pos, 0) == 0]
+            if not unpowered:
+                break
+            target = unpowered[0]
+            path = []
+            while target is not None:
+                path.append(target)
+                target = parents[target]
+            path.reverse()
+            placed = False
+            for j in range(len(path)-2, 0, -1):
+                pos = path[j]
+                before, after = path[j-1], path[j+1]
+                if (pos in source_positions or signals[pos] is not None or
+                        powers.get(pos, 0) == 0 or not is_eligible(pos, block_map)):
                     continue
-            
-            if power > 0:
-                conns = get_connections(pos, state, block_map)
-                for direction, y_off in conns:
-                    off = get_offset(direction)
-                    npos = (pos[0] + off[0], pos[1] + y_off, pos[2] + off[2])
-                    
-                    if npos in block_map:
-                        n_power = power - 1
-                        # Boost power if there's an existing repeater
-                        if npos in global_repeaters:
-                            n_power = 15
-                            
-                        if npos not in graph:
-                            graph[npos] = {
-                                'pos': npos,
-                                'is_eligible': is_eligible(npos, block_map),
-                                'connections': [],
-                                'power': -1
-                            }
-                        
-                        if n_power >= graph[npos]['power']:
-                            if npos not in graph[pos]['connections']:
-                                graph[pos]['connections'].append(npos)
-                            
-                            if n_power > graph[npos]['power']:
-                                graph[npos]['power'] = n_power
-                                queue.append((npos, n_power, path + [npos]))
-
-        # Merge local graph into final_graph
-        for p, data in graph.items():
-            if p not in final_graph:
-                final_graph[p] = {
-                    'pos': p,
-                    'is_eligible': data['is_eligible'],
-                    'connections': list(data['connections']),
-                    'power': data['power']
-                }
-            else:
-                final_graph[p]['power'] = max(final_graph[p]['power'], data['power'])
-                for c in data['connections']:
-                    if c not in final_graph[p]['connections']:
-                        final_graph[p]['connections'].append(c)
-
-    return final_graph, global_repeaters
+                delta = (after[0]-pos[0], after[2]-pos[2])
+                if before != (pos[0]-delta[0], pos[1], pos[2]-delta[1]) or after[1] != pos[1]:
+                    continue
+                signals[pos] = delta
+                repeaters[pos] = FACING[delta]
+                placed = True
+                break
+            if not placed:
+                raise ValueError(f'No powered flat straight repeater site before {path[-1]} '
+                                 f'from {source}; add a landing to this route')
+        else:
+            raise ValueError(f'Repeater placement did not converge from {source}')
+    final_graph = {}
+    for source, source_power, _ in sources:
+        if source not in signals:
+            continue
+        powers = signal_powers(signals, solids, source, source_power)
+        if any(powers.get(pos, 0) == 0 for pos in required[source]):
+            raise ValueError(f'A later repeater broke an earlier source route at {source}')
+        for pos, power in powers.items():
+            entry = final_graph.setdefault(pos, {'pos': pos, 'power': 0,
+                'connections': list(signal_neighbors(pos, signals, solids)),
+                'is_eligible': is_eligible(pos, block_map)})
+            entry['power'] = max(entry['power'], power)
+    return final_graph, repeaters
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

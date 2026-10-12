@@ -23,6 +23,16 @@ class Gate(Circuit):
         self.input_offsets = None
         self.output_offsets = None
 
+    def pin_positions(self, as_out):
+        """Local (x,y) pins; offsets may be legacy x or explicit [x,y]."""
+        offsets = self.output_offsets if as_out else self.input_offsets
+        if offsets is None:
+            count = self.num_outputs if as_out else self.num_inputs
+            spacing = self.output_spacing if as_out else self.input_spacing
+            offsets = [i * (1 + spacing) for i in range(count)]
+        values = offsets.values() if isinstance(offsets, dict) else offsets
+        return [(offset, 0) if isinstance(offset, int) else tuple(offset) for offset in values]
+
 class LogicGates:
     _library = {}
     
