@@ -96,6 +96,18 @@ class LogicGates:
         return LogicGates.get_gate("MUX")
 
     @staticmethod
+    def d_latch():
+        return LogicGates.get_gate("D_LATCH")
+
+    @staticmethod
+    def sr_latch():
+        return LogicGates.get_gate("SR_LATCH")
+
+    @staticmethod
+    def t_latch():
+        return LogicGates.get_gate("T_LATCH")
+
+    @staticmethod
     def and_gate(inputs):
         # Procedural generation for variable-input AND gates
         if inputs == 0:

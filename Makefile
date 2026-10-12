@@ -22,7 +22,7 @@ prep:
 # - flatten: Inlines any submodules into the top module so we have one graph.
 # - abc -liberty: Maps combinational logic securely to our specific Minecraft gates.
 synth: prep $(VERILOG_FILE)
-	yosys -p "read_verilog $(VERILOG_FILE); \
+	yosys -p "read_verilog -lib storage_cells.v; read_verilog $(VERILOG_FILE); \
 	          hierarchy -check -top $(TOP); \
 	          flatten; \
 	          proc; opt; \

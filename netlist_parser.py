@@ -55,7 +55,13 @@ def parse_yosys_json(filepath):
     if not modules:
         return graph
         
-    module_name = list(modules.keys())[0]
+    # Library black boxes also appear in Yosys JSON; select the actual design.
+    def attribute_set(module, name):
+        value = module.get('attributes', {}).get(name, 0)
+        return int(value, 2) != 0 if isinstance(value, str) else bool(value)
+    tops = [name for name, module in modules.items() if attribute_set(module, 'top')]
+    designs = [name for name, module in modules.items() if not attribute_set(module, 'blackbox')]
+    module_name = (tops or designs or list(modules))[0]
     module_data = modules[module_name]
     
     ports = module_data.get("ports", {})
@@ -91,22 +97,26 @@ def parse_yosys_json(filepath):
         connections = cell_info.get("connections", {})
         port_directions = cell_info.get("port_directions", {})
         
-        v = Vertex(cell_name, VertexType.FUNCTION, func_type=cell_type)
+        v = Vertex(cell_name, VertexType.FUNCTION, func_type=cell_type,
+                   input_bits={}, output_bits={}, bits=[])
         graph.add_vertex(v)
         
         for conn_name, bits in connections.items():
             direction = port_directions.get(conn_name)
             if not direction:
-                if conn_name in ["Y", "Q"]:
+                if conn_name in ["Y", "Q", "QN"]:
                     direction = "output"
                 else:
                     direction = "input"
                     
             if direction == "input":
+                v.input_bits[conn_name] = bits
                 for bit in bits:
                     if isinstance(bit, int):
                         bit_readers.setdefault(bit, []).append(v)
             elif direction == "output":
+                v.output_bits[conn_name] = bits
+                v.bits.extend(bits)
                 for bit in bits:
                     if isinstance(bit, int):
                         bit_drivers.setdefault(bit, []).append(v)

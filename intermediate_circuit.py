@@ -80,6 +80,34 @@ class IntermediateCircuit:
         relay_count = 0
         for u in vertices:
             ul = self.v_to_layer[u]
+            if len(getattr(u, 'output_bits', {})) > 1:
+                # Separate relay chains prevent complementary outputs from
+                # being shorted together when crossing intermediate layers.
+                for v in list(u.next):
+                    vl = self.v_to_layer[v]
+                    if vl == ul + 1:
+                        continue
+                    wanted = (v.bits if v.type == VertexType.OUTPUT else
+                              [bit for bits in getattr(v, 'input_bits', {}).values() for bit in bits])
+                    bits = [bit for bit in u.bits if bit in wanted]
+                    step = 1 if vl > ul else -1
+                    layers = range(ul + 1, vl, step) if step == 1 else range(ul, vl - 1, step)
+                    for bit in bits:
+                        prev = u
+                        for r_layer in layers:
+                            relay = Vertex(f'relay_signal_{relay_count}', VertexType.FUNCTION,
+                                           func_type='RELAY', bits=[bit])
+                            relay_count += 1
+                            self.vertex_layers[r_layer].append(relay)
+                            self.v_to_layer[relay] = r_layer
+                            prev.add_next(relay)
+                            relay.add_before(prev)
+                            prev = relay
+                        prev.add_next(v)
+                        v.add_before(prev)
+                    u.next.remove(v)
+                    v.before.remove(u)
+                continue
             forward_dests = []
             backward_dests = []
             
@@ -95,7 +123,7 @@ class IntermediateCircuit:
                 vl = self.v_to_layer[v]
                 prev = u
                 for r_layer in range(ul, vl - 1, -1):
-                    relay = Vertex(f"relay_backward_{relay_count}", VertexType.FUNCTION, func_type="RELAY")
+                    relay = Vertex(f"relay_backward_{relay_count}", VertexType.FUNCTION, func_type="RELAY", bits=getattr(u, 'bits', []))
                     relay_count += 1
                     self.vertex_layers[r_layer].append(relay)
                     self.v_to_layer[relay] = r_layer
@@ -115,7 +143,7 @@ class IntermediateCircuit:
                 relays = {}
                 prev = u
                 for r_layer in range(ul + 1, max_vl):
-                    relay = Vertex(f"relay_forward_{relay_count}", VertexType.FUNCTION, func_type="RELAY")
+                    relay = Vertex(f"relay_forward_{relay_count}", VertexType.FUNCTION, func_type="RELAY", bits=getattr(u, 'bits', []))
                     relay_count += 1
                     self.vertex_layers[r_layer].append(relay)
                     self.v_to_layer[relay] = r_layer
@@ -153,6 +181,11 @@ class IntermediateCircuit:
         if ft in ['XOR', 'XOR2', '_XOR_', 'XNOR', 'XNOR2', '_XNOR_']: return LogicGates.xor_gate()
         if ft in ['INV', 'NOT', 'NOT1', '_NOT_']: return LogicGates._not()
         if ft in ['MUX', '_MUX_']: return LogicGates.mux_gate()
+        if ft == '_DLATCH_P_': return LogicGates.d_latch()
+        if ft == 'MC_SR_LATCH': return LogicGates.sr_latch()
+        if ft == 'MC_T_LATCH': return LogicGates.t_latch()
+        if ft.startswith(('_DLATCH', '_DFF', '_SDFF', '_ADFF', '_SR_')):
+            raise ValueError(f"Unsupported storage cell {v.func_type}; use a positive-enable D latch or an explicit MC_SR_LATCH/MC_T_LATCH")
         return LogicGates.relay()
 
     def _get_pins(self, v, g, as_out):
@@ -163,6 +196,31 @@ class IntermediateCircuit:
         cnt = (getattr(g, 'num_outputs', 1) if as_out else getattr(g, 'num_inputs', 1))
         spc = (getattr(g, 'output_spacing', 1) if as_out else getattr(g, 'input_spacing', 1))
         return [g.x_offset + (i * (1 + spc)) for i in range(cnt)]
+
+    def _input_pins_for_source(self, v, g, source, pointers):
+        """Named pins must follow Yosys port roles, not placement order."""
+        if isinstance(g.input_offsets, dict):
+            source_bits = getattr(source, 'bits', [])
+            return [g.x_offset + offset
+                    for port, offset in g.input_offsets.items()
+                    if any(bit in source_bits for bit in v.input_bits.get(port, []))]
+        pins = self._get_pins(v, g, False)
+        wanted = getattr(v, 'bits', []) if v.type == VertexType.OUTPUT or getattr(v, 'func_type', '') == 'RELAY' else [bit for bits in getattr(v, 'input_bits', {}).values() for bit in bits]
+        if wanted and not set(wanted).intersection(getattr(source, 'bits', [])):
+            return []
+        ptr = pointers[v]
+        if ptr >= len(pins):
+            return []
+        pointers[v] += 1
+        return [pins[ptr]]
+
+    def _output_sources(self, v, g):
+        """Associate each physical output with its own signal, including Q/QN."""
+        if isinstance(g.output_offsets, dict) and getattr(v, 'output_bits', None):
+            return [(g.x_offset + offset,
+                     Vertex(v.name, v.type, bits=v.output_bits.get(port, [])))
+                    for port, offset in g.output_offsets.items()]
+        return [(pin, v) for pin in self._get_pins(v, g, True)]
 
     def route_channels(self):
         # 1. Multi-pass barycenter sweep to minimize crossing connections (Sugiyama method)
@@ -251,53 +309,39 @@ class IntermediateCircuit:
 
             # 1. Nets from tvl
             for ui, u in enumerate(tvl):
-                oxs = self._get_pins(u, tgl[ui], True)
-                for pi, ox in enumerate(oxs):
+                for ox, source in self._output_sources(u, tgl[ui]):
                     net = [(ox, 0, True)]
                     for v in u.next:
                         if v in bvl: # Forward target
                             vi = bvl.index(v)
-                            ixs = self._get_pins(v, bgl[vi], False)
-                            ptr = v_in_ptr[v]
-                            if ptr < len(ixs):
-                                net.append((ixs[ptr], 0, False))
-                                v_in_ptr[v] += 1
+                            for ix in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr):
+                                net.append((ix, 0, False))
                         elif v in tvl: # Same-layer target (only if target is RELAY)
                             if getattr(v, 'func_type', '') == 'RELAY':
                                 vi = tvl.index(v)
-                                ixs = self._get_pins(v, tgl[vi], False)
-                                ptr = v_in_ptr[v]
-                                if ptr < len(ixs):
-                                    net.append((ixs[ptr], 0, True))
-                                    v_in_ptr[v] += 1
+                                for ix in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr):
+                                    net.append((ix, 0, True))
                     if len(net) > 1:
                         nets_in.append(net)
 
             # 2. Nets from bvl
             for ui, u in enumerate(bvl):
-                oxs = self._get_pins(u, bgl[ui], True)
-                for pi, ox in enumerate(oxs):
+                for ox, source in self._output_sources(u, bgl[ui]):
                     net = []
                     for v in u.next:
                         if v in tvl: # Backward target
                             vi = tvl.index(v)
-                            ixs = self._get_pins(v, tgl[vi], False)
-                            ptr = v_in_ptr[v]
-                            if ptr < len(ixs):
+                            for ix in self._input_pins_for_source(v, tgl[vi], source, v_in_ptr):
                                 if not net:
                                     net.append((ox, 0, False))
-                                net.append((ixs[ptr], 0, True))
-                                v_in_ptr[v] += 1
+                                net.append((ix, 0, True))
                         elif v in bvl: # Same-layer target (only if source u is RELAY)
                             if getattr(u, 'func_type', '') == 'RELAY':
                                 vi = bvl.index(v)
-                                ixs = self._get_pins(v, bgl[vi], False)
-                                ptr = v_in_ptr[v]
-                                if ptr < len(ixs):
+                                for ix in self._input_pins_for_source(v, bgl[vi], source, v_in_ptr):
                                     if not net:
                                         net.append((ox, 0, False))
-                                    net.append((ixs[ptr], 0, False))
-                                    v_in_ptr[v] += 1
+                                    net.append((ix, 0, False))
                     if net:
                         nets_in.append(net)
 

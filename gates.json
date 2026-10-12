@@ -1,31 +1,56 @@
 {
   "NOT": {
-    "size": [1, 1, 2],
+    "size": [
+      1,
+      1,
+      2
+    ],
     "num_inputs": 1,
     "num_outputs": 1,
-    "input_offsets": [0],
-    "output_offsets": [0],
+    "input_offsets": [
+      0
+    ],
+    "output_offsets": [
+      0
+    ],
     "blocks": {
       "0,0,0": "minecraft:white_wool",
       "0,0,1": "minecraft:redstone_wall_torch[facing=south]"
     }
   },
   "RELAY": {
-    "size": [1, 1, 1],
+    "size": [
+      1,
+      1,
+      1
+    ],
     "num_inputs": 1,
     "num_outputs": 1,
-    "input_offsets": [0],
-    "output_offsets": [0],
+    "input_offsets": [
+      0
+    ],
+    "output_offsets": [
+      0
+    ],
     "blocks": {
       "0,0,0": "minecraft:redstone_wire"
     }
   },
   "XOR": {
-    "size": [5, 1, 5],
+    "size": [
+      5,
+      1,
+      5
+    ],
     "num_inputs": 2,
     "num_outputs": 1,
-    "input_offsets": [0, 4],
-    "output_offsets": [2],
+    "input_offsets": [
+      0,
+      4
+    ],
+    "output_offsets": [
+      2
+    ],
     "blocks": {
       "0,0,0": "minecraft:repeater[facing=north]",
       "4,0,0": "minecraft:repeater[facing=north]",
@@ -44,8 +69,35 @@
       "2,0,4": "minecraft:repeater[facing=north]"
     }
   },
+  "D_LATCH": {
+    "size": [
+      3,
+      1,
+      2
+    ],
+    "num_inputs": 2,
+    "num_outputs": 1,
+    "input_offsets": {
+      "E": 0,
+      "D": 2
+    },
+    "output_offsets": {
+      "Q": 2
+    },
+    "blocks": {
+      "0,0,0": "minecraft:white_wool",
+      "0,0,1": "minecraft:redstone_wall_torch[facing=south]",
+      "1,0,1": "minecraft:repeater[facing=west,delay=1]",
+      "2,0,1": "minecraft:repeater[facing=north,delay=1]",
+      "2,0,0": "minecraft:redstone_wire"
+    }
+  },
   "MUX": {
-    "size": [5, 3, 4],
+    "size": [
+      5,
+      3,
+      4
+    ],
     "num_inputs": 3,
     "num_outputs": 1,
     "input_offsets": {
@@ -79,6 +131,82 @@
       "4,2,1": "minecraft:comparator[facing=north,mode=subtract,powered=false]",
       "4,2,2": "minecraft:white_wool",
       "4,0,3": "minecraft:repeater[delay=1,facing=north,locked=false,powered=false]"
+    }
+  },
+  "SR_LATCH": {
+    "size": [
+      3,
+      2,
+      2
+    ],
+    "blocks": {
+      "0,0,0": "minecraft:redstone_wire",
+      "1,0,0": "minecraft:redstone_wall_torch[facing=west]",
+      "2,0,0": "minecraft:white_wool",
+      "0,0,1": "minecraft:white_wool",
+      "1,0,1": "minecraft:redstone_wall_torch[facing=east]",
+      "2,0,1": "minecraft:redstone_wire",
+      "2,1,0": "minecraft:redstone_wire",
+      "0,1,1": "minecraft:redstone_wire"
+    },
+    "num_inputs": 2,
+    "num_outputs": 2,
+    "input_offsets": {
+      "S": 2,
+      "R": 0
+    },
+    "output_offsets": {
+      "QN": 0,
+      "Q": 2
+    },
+    "behavior": {
+      "kind": "sr_latch",
+      "active_high": true,
+      "simultaneous_set_reset": "forbidden"
+    }
+  },
+  "T_LATCH": {
+    "size": [
+      3,
+      1,
+      4
+    ],
+    "blocks": {
+      "0,0,0": "minecraft:observer[facing=north]",
+      "2,0,0": "minecraft:comparator[facing=north,mode=subtract]",
+      "0,0,1": "minecraft:redstone_wire",
+      "1,0,1": "minecraft:repeater[delay=1,facing=west]",
+      "2,0,1": "minecraft:waxed_copper_bulb[lit=false,powered=false]",
+      "1,0,2": "minecraft:repeater[delay=1,facing=south]",
+      "2,0,2": "minecraft:comparator[facing=north,mode=compare]",
+      "0,0,3": "minecraft:redstone_wire",
+      "1,0,3": "minecraft:redstone_wall_torch[facing=west]",
+      "2,0,3": "minecraft:white_wool"
+    },
+    "num_inputs": 2,
+    "num_outputs": 2,
+    "input_offsets": {
+      "R": 0,
+      "T": 2
+    },
+    "output_offsets": {
+      "QN": 0,
+      "Q": 2
+    },
+    "behavior": {
+      "kind": "toggle_reset",
+      "toggle_edge": "rising",
+      "reset_edge": "both",
+      "reset_requires_toggle_low": true,
+      "tested_toggle_high_ticks": [
+        4,
+        8,
+        20,
+        100,
+        1200
+      ],
+      "tested_toggle_low_ticks": 60,
+      "two_tick_toggle_supported": false
     }
   }
 }

@@ -150,7 +150,10 @@ def generate_circuit_schematic(json_filepath, filename):
     print(f"Successfully generated {filename}.schem")
 
     # Copy to WorldEdit schematics directory
-    target_dir = "/home/kajat/.local/share/PrismLauncher/instances/Fabulously Optimized(1)/minecraft/config/worldedit/schematics"
+    target_dir = os.environ.get(
+        "WORLDEDIT_SCHEMATICS_DIR",
+        "/home/kajat/.local/share/PrismLauncher/instances/Fabulously Optimized(1)/minecraft/config/worldedit/schematics",
+    )
     os.makedirs(target_dir, exist_ok=True)
     
     source_file = f"{filename}.schem"
