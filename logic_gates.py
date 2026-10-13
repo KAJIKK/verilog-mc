@@ -102,6 +102,17 @@ class LogicGates:
         return LogicGates.get_gate("XOR")
 
     @staticmethod
+    def xnor_gate():
+        # Preserve XOR's restored output, then invert it just like NOT's
+        # wool + wall-torch interface. XNOR must not silently become XOR.
+        gate = LogicGates.xor_gate()
+        x,y = gate.pin_positions(True)[0]
+        gate.set_block(x,y,gate.size_z,'minecraft:white_wool')
+        gate.set_block(x,y,gate.size_z+1,'minecraft:redstone_wall_torch[facing=south]')
+        gate.size_z += 2
+        return gate
+
+    @staticmethod
     def mux_gate():
         return LogicGates.get_gate("MUX")
 

@@ -183,7 +183,8 @@ class IntermediateCircuit:
         if ft in ['NAND', 'NAND2', '_NAND_']: return LogicGates.nand_gate(num_in)
         if ft in ['OR', 'OR2', '_OR_']: return LogicGates.or_gate(num_in)
         if ft in ['NOR', 'NOR2', '_NOR_']: return LogicGates.nor_gate(num_in)
-        if ft in ['XOR', 'XOR2', '_XOR_', 'XNOR', 'XNOR2', '_XNOR_']: return LogicGates.xor_gate()
+        if ft in ['XOR', 'XOR2', '_XOR_']: return LogicGates.xor_gate()
+        if ft in ['XNOR', 'XNOR2', '_XNOR_']: return LogicGates.xnor_gate()
         if ft in ['INV', 'NOT', 'NOT1', '_NOT_']: return LogicGates._not()
         if ft in ['MUX', '_MUX_']: return LogicGates.mux_gate()
         if ft == '_DLATCH_P_': return LogicGates.d_latch()
@@ -224,7 +225,7 @@ class IntermediateCircuit:
                     for (port, offset), pin in zip(g.output_offsets.items(), pins)]
         return [(pin, v) for pin in self._get_pins(v, g, True, with_height)]
 
-    def route_channels(self, workers=None):
+    def _place_legacy(self):
         # 1. Multi-pass barycenter sweep to minimize crossing connections (Sugiyama method)
         num_layers = len(self.vertex_layers)
         num_sweeps = 12
@@ -298,6 +299,163 @@ class IntermediateCircuit:
                 ncx = sx + g.size_x + 1 # 1-block gap is sufficient
                 if ncx % 2 != 0: ncx += 1
 
+    def _placement_edges(self):
+        """Physical pin pairs, using the same signal mapping as channel routing.
+
+        List-based logic inputs are interchangeable; named inputs and distinct
+        outputs always keep their signal identity. No graph edges are rewritten.
+        """
+        gates = {v:g for vs,gs in zip(self.vertex_layers,self.gate_layers)
+                 for v,g in zip(vs,gs)}
+        pointers = {v:0 for v in gates}
+        edges = []
+        for i in range(len(self.vertex_layers)-1):
+            top, bottom = self.vertex_layers[i:i+2]
+            for row, other, is_top in ((top,bottom,True),(bottom,top,False)):
+                for u in row:
+                    for (ox,oy),source in self._output_sources(u,gates[u],True):
+                        for v in u.next:
+                            same = v in row
+                            if v not in other and not (same and getattr(v if is_top else u,'func_type','') == 'RELAY'):
+                                continue
+                            for ix,iy in self._input_pins_for_source(v,gates[v],source,pointers,True):
+                                edges.append((i,u,ox-gates[u].x_offset,oy,
+                                              v,ix-gates[v].x_offset,iy,same))
+        return edges
+
+    def place_gates(self, placement='compact'):
+        """Bound row width first, then reduce physical pin span and crossings.
+
+        Even X offsets and the existing one-block minimum gap are preserved.
+        Coordinate descent uses exact dynamic programming for row offsets and
+        pin-aware ordering sweeps, retaining the best whole-layout snapshot.
+        """
+        if placement not in ('compact','legacy'):
+            raise ValueError("placement must be 'compact' or 'legacy'")
+        if placement == 'legacy':
+            self._place_legacy()
+            self.placement_stats = {'method':'legacy'}
+            return
+        if not self.gate_layers:
+            return
+        def packed_width(gs):
+            x = 0
+            for g in gs:
+                g.x_offset = x
+                x += g.size_x + 1
+                x += x % 2
+            # An even-width gate needs two gap cells before the next even
+            # origin. Leave room for any gate becoming last after reordering.
+            return x - 1 if gs else 0
+        # Round each gate's allocated pitch to even, but omit the final gap.
+        width = max(packed_width(gs) for gs in self.gate_layers)
+        gates = {v:g for vs,gs in zip(self.vertex_layers,self.gate_layers)
+                 for v,g in zip(vs,gs)}
+
+        def snapshot():
+            return [(list(vs),list(gs),[g.x_offset for g in gs])
+                    for vs,gs in zip(self.vertex_layers,self.gate_layers)]
+
+        def restore(state):
+            for i,(vs,gs,xs) in enumerate(state):
+                self.vertex_layers[i],self.gate_layers[i] = list(vs),list(gs)
+                for g,x in zip(gs,xs):
+                    g.x_offset = x
+
+        def score():
+            spans = [0]*(len(self.gate_layers)-1)
+            lengths, crossing = 0, 0
+            channels = [[] for _ in spans]
+            for i,u,ox,oy,v,ix,iy,same in self._placement_edges():
+                a,b = gates[u].x_offset+ox,gates[v].x_offset+ix
+                d = abs(a-b)
+                lengths += d
+                spans[i] = max(spans[i],d)
+                if not same:
+                    if self.v_to_layer[u] > self.v_to_layer[v]:
+                        a,b = b,a
+                    channels[i].append((a,b))
+            for channel in channels:
+                crossing += sum((a-c)*(b-d)<0 for j,(a,b) in enumerate(channel)
+                                for c,d in channel[j+1:])
+            return lengths + 2*sum(spans) + 4*crossing
+
+        def optimize_row(i, reorder):
+            vs,gs = self.vertex_layers[i],self.gate_layers[i]
+            if not vs:
+                return
+            incident = {v:[] for v in vs}
+            for _,u,ox,oy,v,ix,iy,same in self._placement_edges():
+                if u in incident:
+                    incident[u].append(gates[v].x_offset+ix-ox)
+                if v in incident:
+                    incident[v].append(gates[u].x_offset+ox-ix)
+            if reorder:
+                # Desired gate origins use pin coordinates, not gate indices.
+                pairs = sorted(zip(vs,gs), key=lambda p:
+                               (sum(incident[p[0]])/len(incident[p[0]])
+                                if incident[p[0]] else p[1].x_offset))
+                vs,gs = [v for v,g in pairs],[g for v,g in pairs]
+                self.vertex_layers[i],self.gate_layers[i] = vs,gs
+            # Shortest-path DP over possible even origins. Prefix minima make
+            # this O((gates + edges) * width), not an enumeration of gap layouts.
+            costs, parents = {}, []
+            for j,(v,g) in enumerate(zip(vs,gs)):
+                next_costs, parent = {}, {}
+                options = sorted(costs)
+                k, best_cost, best_x = 0, float('inf'), None
+                for x in range(0,width-g.size_x+1,2):
+                    if j:
+                        limit = x-gs[j-1].size_x-1
+                        while k < len(options) and options[k] <= limit:
+                            px = options[k]
+                            if costs[px] < best_cost:
+                                best_cost,best_x = costs[px],px
+                            k += 1
+                        if best_x is None:
+                            continue
+                    local_cost = sum(abs(x-target) for target in incident[v])
+                    next_costs[x] = local_cost + (best_cost if j else 0)
+                    parent[x] = best_x
+                costs = next_costs
+                parents.append(parent)
+            if not costs:
+                raise ValueError('Gate row does not fit its compact width budget')
+            x = min(costs,key=lambda x:(costs[x],x))
+            for j in range(len(gs)-1,-1,-1):
+                gs[j].x_offset = x
+                x = parents[j][x]
+
+        best, best_score = snapshot(),score()
+        for sweep in range(8):
+            order = range(len(self.gate_layers)) if sweep % 2 else range(len(self.gate_layers)-1,-1,-1)
+            for i in order:
+                optimize_row(i,True)
+                candidate = score()
+                if candidate < best_score:
+                    best,best_score = snapshot(),candidate
+        restore(best)
+        # Adjacent exchanges escape barycenter ties/local ordering mistakes.
+        for _ in range(2):
+            improved = False
+            for i in range(len(self.gate_layers)):
+                for j in range(len(self.gate_layers[i])-1):
+                    before = snapshot()
+                    for row in (self.vertex_layers[i],self.gate_layers[i]):
+                        row[j],row[j+1] = row[j+1],row[j]
+                    optimize_row(i,False)
+                    candidate = score()
+                    if candidate < best_score:
+                        best,best_score,improved = snapshot(),candidate,True
+                    else:
+                        restore(before)
+            if not improved:
+                break
+        self.placement_stats = {'method':'compact','row_width_budget':width,
+                                'estimated_wiring_cost':best_score}
+
+    def route_channels(self, workers=None, placement='compact'):
+        self.place_gates(placement)
         # Phase 2: Pre-calculate routing inputs sequentially
         num_channels = len(self.vertex_layers) - 1
         v_in_ptr = {v: 0 for layer in self.vertex_layers for v in layer}

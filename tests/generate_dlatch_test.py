@@ -5,6 +5,10 @@ import random
 from pathlib import Path
 
 import mcschematic
+if __package__:
+    from .generate_adder_test import placement_commands
+else:
+    from generate_adder_test import placement_commands
 
 
 def test_sequence():
@@ -75,6 +79,7 @@ def generate(schematic, origin, destination):
     def write(name, commands):
         (functions / f"{name}.mcfunction").write_text("\n".join(commands) + "\n")
 
+    write('place',placement_commands(structure,origin))
     steps = test_sequence()
     write("start", [
         f"schedule clear dlatch_test:check_{i}" for i in range(len(steps))

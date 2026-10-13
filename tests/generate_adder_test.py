@@ -5,12 +5,50 @@ use /reload, /function adder4_test:start and /tick sprint 26000t via Minecraft M
 """
 import argparse
 import json
+import re
 from pathlib import Path
 
 import mcschematic
 
 
-def generate(schematic, origin, destination):
+def fill_commands(low, high, origin, block='minecraft:air'):
+    """Split all three axes so even a large floor fits the 32768-block cap."""
+    def world_pos(p):
+        return ' '.join(str(a+b) for a,b in zip(p,origin))
+    dx = min(high[0]-low[0]+1,32768)
+    dy = min(high[1]-low[1]+1,32768//dx)
+    dz = min(high[2]-low[2]+1,32768//(dx*dy))
+    return [f'fill {world_pos((x,y,z))} '
+            f'{world_pos((min(x+dx-1,high[0]),min(y+dy-1,high[1]),min(z+dz-1,high[2])))} {block}'
+            for x in range(low[0],high[0]+1,dx)
+            for y in range(low[1],high[1]+1,dy)
+            for z in range(low[2],high[2]+1,dz)]
+
+
+def placement_commands(structure, origin):
+    """Exact-origin placement shared by live tests, with supports before dust."""
+    states = {p:structure.getBlockStateAt(p) for p in structure.getBlockStates()}
+    low = tuple(min(p[axis] for p in states) for axis in range(3))
+    high = tuple(max(p[axis] for p in states) for axis in range(3))
+    def world_pos(p):
+        return ' '.join(str(a+b) for a,b in zip(p,origin))
+    placement = fill_commands(low,high,origin)
+    def rank(item):
+        state = item[1]
+        return (2 if 'redstone_wire' in state else
+                1 if any(name in state for name in ('repeater','comparator','torch','sign','lever')) else 0,
+                -item[0][1],-item[0][2],item[0][0])
+    for p,state in sorted(states.items(),key=rank):
+        if state.split('[',1)[0] in ('minecraft:air','minecraft:cave_air','minecraft:void_air'):
+            continue
+        data = structure.getBlockDataAt(p) if 'sign' in state else ''
+        placement.append(f'setblock {world_pos(p)} {data or state}')
+    return placement
+
+
+def generate(schematic, origin, destination, namespace='adder4_test'):
+    if not re.fullmatch(r'[a-z0-9_]{1,16}',namespace):
+        raise ValueError('Test namespace must be 1-16 lowercase letters, digits or underscores')
     structure = mcschematic.MCSchematic(str(schematic)).getStructure()
     pins = {}
     for pos in structure.getBlockStates():
@@ -27,8 +65,8 @@ def generate(schematic, origin, destination):
     if len(pins) != 13:
         raise ValueError(f"Expected 13 labeled IO pins, found {pins}")
 
-    root = Path(destination) / "adder4_test"
-    functions = root / "data" / "adder4_test" / "function"
+    root = Path(destination) / namespace
+    functions = root / "data" / namespace / "function"
     functions.mkdir(parents=True, exist_ok=True)
     (root / "pack.mcmeta").write_text(json.dumps({"pack": {
         "description": "Exhaustive live redstone adder4 test",
@@ -36,31 +74,12 @@ def generate(schematic, origin, destination):
     }}, indent=2) + "\n")
 
     def write(name, commands):
-        (functions / f"{name}.mcfunction").write_text("\n".join(commands) + "\n")
+        (functions / f"{name}.mcfunction").write_text(
+            "\n".join(command.replace('adder4_test',namespace) for command in commands) + "\n")
 
     # Optional exact-origin placement, independent of the player's movement.
     # Existing WorldEdit workflows still call start after their own paste.
-    states = {p:structure.getBlockStateAt(p) for p in structure.getBlockStates()}
-    low = tuple(min(p[axis] for p in states) for axis in range(3))
-    high = tuple(max(p[axis] for p in states) for axis in range(3))
-    def world_pos(p):
-        return ' '.join(str(a+b) for a,b in zip(p,origin))
-    slab = max(1,32768 // ((high[0]-low[0]+1)*(high[2]-low[2]+1)))
-    placement = [f'fill {world_pos((low[0],y,low[2]))} '
-                 f'{world_pos((high[0],min(y+slab-1,high[1]),high[2]))} air'
-                 for y in range(low[1],high[1]+1,slab)]
-    def rank(item):
-        state = item[1]
-        return (2 if 'redstone_wire' in state else
-                1 if any(name in state for name in ('repeater','comparator','torch','sign','lever')) else 0,
-                -item[0][1],-item[0][2],item[0][0])
-    for p,state in sorted(states.items(),key=rank):
-        if state.split('[',1)[0] in ('minecraft:air','minecraft:cave_air','minecraft:void_air'):
-            continue
-        data = structure.getBlockDataAt(p) if 'sign' in state else ''
-        # mcschematic returns the complete block specification, not just NBT.
-        placement.append(f'setblock {world_pos(p)} {data or state}')
-    write('place',placement)
+    write('place',placement_commands(structure,origin))
 
     write("start", [
         "schedule clear adder4_test:check",
@@ -133,5 +152,6 @@ if __name__ == "__main__":
     parser.add_argument("schematic", type=Path)
     parser.add_argument("datapacks", type=Path)
     parser.add_argument("--origin", type=int, nargs=3, required=True)
+    parser.add_argument('--namespace',default='adder4_test',help='Separate datapack/storage name for experiments')
     args = parser.parse_args()
-    generate(args.schematic, args.origin, args.datapacks)
+    generate(args.schematic, args.origin, args.datapacks,args.namespace)
