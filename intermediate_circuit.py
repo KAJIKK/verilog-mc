@@ -30,6 +30,7 @@ class IntermediateCircuit:
         self.channels = []
 
     def load_graph(self, graph):
+        self.lut_stats = getattr(graph,'lut_stats',{})
         vertices = list(graph.vertices.values())
         placed = set()
         self.v_to_layer = {}
@@ -88,6 +89,7 @@ class IntermediateCircuit:
             if len(getattr(u, 'output_bits', {})) > 1:
                 # Separate relay chains prevent complementary outputs from
                 # being shorted together when crossing intermediate layers.
+                distant = {}
                 for v in list(u.next):
                     vl = self.v_to_layer[v]
                     if vl == ul + 1:
@@ -95,13 +97,35 @@ class IntermediateCircuit:
                     wanted = (v.bits if v.type == VertexType.OUTPUT else
                               [bit for bits in getattr(v, 'input_bits', {}).values() for bit in bits])
                     bits = [bit for bit in u.bits if bit in wanted]
-                    step = 1 if vl > ul else -1
-                    layers = range(ul + 1, vl, step) if step == 1 else range(ul, vl - 1, step)
                     for bit in bits:
+                        distant.setdefault(bit,[]).append(v)
+                    u.next.remove(v)
+                    v.before.remove(u)
+                for bit,destinations in distant.items():
+                    forward = [v for v in destinations if self.v_to_layer[v] > ul]
+                    if forward:
+                        prev,relays = u,{}
+                        for r_layer in range(ul+1,max(self.v_to_layer[v] for v in forward)):
+                            relay = Vertex(f'relay_signal_{relay_count}',VertexType.FUNCTION,
+                                           func_type='RELAY',bits=[bit])
+                            relay_count += 1
+                            self.vertex_layers[r_layer].append(relay)
+                            self.v_to_layer[relay] = r_layer
+                            prev.add_next(relay)
+                            relay.add_before(prev)
+                            relays[r_layer] = relay
+                            prev = relay
+                        for v in forward:
+                            source = relays[self.v_to_layer[v]-1]
+                            source.add_next(v)
+                            v.add_before(source)
+                    for v in destinations:
+                        if self.v_to_layer[v] > ul:
+                            continue
                         prev = u
-                        for r_layer in layers:
-                            relay = Vertex(f'relay_signal_{relay_count}', VertexType.FUNCTION,
-                                           func_type='RELAY', bits=[bit])
+                        for r_layer in range(ul,self.v_to_layer[v]-1,-1):
+                            relay = Vertex(f'relay_signal_{relay_count}',VertexType.FUNCTION,
+                                           func_type='RELAY',bits=[bit])
                             relay_count += 1
                             self.vertex_layers[r_layer].append(relay)
                             self.v_to_layer[relay] = r_layer
@@ -110,8 +134,6 @@ class IntermediateCircuit:
                             prev = relay
                         prev.add_next(v)
                         v.add_before(prev)
-                    u.next.remove(v)
-                    v.before.remove(u)
                 continue
             forward_dests = []
             backward_dests = []
@@ -178,6 +200,8 @@ class IntermediateCircuit:
         if v.type == VertexType.INPUT: return LogicGates.input_gate(v.name)
         if v.type == VertexType.OUTPUT: return LogicGates.output_gate(v.name)
         if ft == 'RELAY': return LogicGates.relay()
+        if ft == 'LUT':
+            return LogicGates.lut_gate(len(v.input_bits),len(v.output_bits),v.lut_data)
         num_in = getattr(v, 'num_inputs', max(1, len(v.before)))
         if ft in ['AND', 'AND2', '_AND_']: return LogicGates.and_gate(num_in)
         if ft in ['NAND', 'NAND2', '_NAND_']: return LogicGates.nand_gate(num_in)
@@ -563,6 +587,7 @@ class IntermediateCircuit:
 
     def get_statistics(self):
         stats = {"gate_counts": {}, "total_gates": 0, "max_delay": len(self.vertex_layers)}
+        stats['lut_mapping'] = getattr(self,'lut_stats',{})
         for layer in self.vertex_layers:
             for v in layer:
                 ft = getattr(v, 'func_type', v.type)

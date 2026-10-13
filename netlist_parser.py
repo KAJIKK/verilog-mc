@@ -30,6 +30,7 @@ class Vertex:
 class Graph:
     def __init__(self):
         self.vertices = {}
+        self.lut_stats = {}
         
     def add_vertex(self, v):
         self.vertices[v.name] = v
@@ -45,7 +46,7 @@ class Graph:
             for n in v.next:
                 print(f"  -> {n.name}")
 
-def parse_yosys_json(filepath):
+def parse_yosys_json(filepath, *, pack_luts=True):
     with open(filepath, 'r') as f:
         data = json.load(f)
         
@@ -65,7 +66,8 @@ def parse_yosys_json(filepath):
     module_data = modules[module_name]
     
     ports = module_data.get("ports", {})
-    cells = module_data.get("cells", {})
+    from lut_mapping import pack_lut_cells,decode_lut
+    cells,graph.lut_stats = pack_lut_cells(module_data,pack_luts)
     
     bit_drivers = {}
     bit_readers = {}
@@ -88,7 +90,7 @@ def parse_yosys_json(filepath):
                 name = f"{port_name}[{i}]" if len(bits) > 1 else port_name
                 v = Vertex(name, VertexType.OUTPUT, bits=[bit])
                 graph.add_vertex(v)
-                if isinstance(bit, int):
+                if isinstance(bit, int) or bit in ('0','1'):
                     bit_readers.setdefault(bit, []).append(v)
                 
     # Process Cells (Gates)
@@ -100,6 +102,19 @@ def parse_yosys_json(filepath):
         v = Vertex(cell_name, VertexType.FUNCTION, func_type=cell_type,
                    input_bits={}, output_bits={}, bits=[])
         graph.add_vertex(v)
+
+        if cell_type == 'MC_LUT':
+            lut = decode_lut(cell_info)
+            v.func_type = 'LUT'
+            v.input_bits = {f'I{i}':[bit] for i,bit in enumerate(lut.inputs)}
+            v.output_bits = {f'O{i}':[bit] for i,bit in enumerate(lut.outputs)}
+            v.bits = list(lut.outputs)
+            v.lut_data = lut.data
+            for bit in lut.inputs:
+                bit_readers.setdefault(bit,[]).append(v)
+            for bit in lut.outputs:
+                bit_drivers.setdefault(bit,[]).append(v)
+            continue
         
         for conn_name, bits in connections.items():
             direction = port_directions.get(conn_name)
@@ -112,7 +127,7 @@ def parse_yosys_json(filepath):
             if direction == "input":
                 v.input_bits[conn_name] = bits
                 for bit in bits:
-                    if isinstance(bit, int):
+                    if isinstance(bit, int) or bit in ('0','1'):
                         bit_readers.setdefault(bit, []).append(v)
             elif direction == "output":
                 v.output_bits[conn_name] = bits
@@ -121,6 +136,17 @@ def parse_yosys_json(filepath):
                     if isinstance(bit, int):
                         bit_drivers.setdefault(bit, []).append(v)
                     
+    # Literal rails are explicit zero-input LUTs, not undriven lamp/wool pins.
+    for literal in ('0','1'):
+        if literal in bit_readers:
+            name = f'constant_{literal}'
+            while name in graph.vertices:
+                name = '_'+name
+            constant = Vertex(name,VertexType.FUNCTION,func_type='LUT',bits=[literal],
+                              input_bits={},output_bits={'O0':[literal]},lut_data=(int(literal),))
+            graph.add_vertex(constant)
+            bit_drivers[literal] = [constant]
+
     # Connect drivers to readers
     for bit, drivers in bit_drivers.items():
         if bit in bit_readers:

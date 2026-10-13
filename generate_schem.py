@@ -70,6 +70,9 @@ def resolve_redstone_wires(block_map):
 def generate_circuit_schematic(json_filepath, filename):
     print(f"Parsing {json_filepath}...")
     graph = netlist_parser.parse_yosys_json(json_filepath)
+    if graph.lut_stats:
+        print(f'LUT packing: {graph.lut_stats["original_luts"]} mapped LUTs -> '
+              f'{graph.lut_stats["packed_luts"]} multi-output macros')
     
     print("Building intermediate circuit layers...")
     ic = IntermediateCircuit()
@@ -147,7 +150,7 @@ def generate_circuit_schematic(json_filepath, filename):
     # Copy to WorldEdit schematics directory
     target_dir = os.environ.get(
         "WORLDEDIT_SCHEMATICS_DIR",
-        "/home/kajat/.local/share/PrismLauncher/instances/Fabulously Optimized(1)/minecraft/config/worldedit/schematics",
+        "/home/kajat/.local/share/PrismLauncher/instances/Fabulously Optimized/minecraft/config/worldedit/schematics",
     )
     os.makedirs(target_dir, exist_ok=True)
     

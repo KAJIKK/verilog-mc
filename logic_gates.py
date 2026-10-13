@@ -102,6 +102,11 @@ class LogicGates:
         return LogicGates.get_gate("XOR")
 
     @staticmethod
+    def lut_gate(num_inputs,num_outputs,data):
+        from generate_lut import build_lut
+        return build_lut(num_inputs,num_outputs,data)
+
+    @staticmethod
     def xnor_gate():
         # Preserve XOR's restored output, then invert it just like NOT's
         # wool + wall-torch interface. XNOR must not silently become XOR.

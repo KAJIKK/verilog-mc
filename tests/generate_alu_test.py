@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import random
+import re
 
 import mcschematic
 
@@ -79,6 +80,15 @@ def verify_netlist(path,vectors):
                 raise ValueError('Combinational loop in the mapped ALU')
             active.add(bit)
             cell = drivers[bit]
+            if cell['type'] in ('$lut','$_LUT_','MC_LUT'):
+                from lut_mapping import parameter_int
+                address = sum(int(bit_value(b))<<i for i,b in enumerate(cell['connections']['A']))
+                count = parameter_int(cell['parameters'].get('OUTPUTS',1))
+                table = parameter_int(cell['parameters']['LUT'])
+                output = cell['connections']['Y'].index(bit)
+                values[bit] = bool((table>>(address*count+output))&1)
+                active.remove(bit)
+                return values[bit]
             args = {port:bit_value(bits[0]) for port,bits in cell['connections'].items()
                     if not is_output(cell,port)}
             a,b = args.get('A',False),args.get('B',False)
@@ -97,7 +107,9 @@ def verify_netlist(path,vectors):
     return len(vectors)
 
 
-def generate(schematic,origin,destination,settle=400):
+def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
+    if not re.fullmatch(r'[a-z0-9_]{1,16}',namespace):
+        raise ValueError('Test namespace must be 1-16 lowercase letters, digits or underscores')
     if settle < 1:
         raise ValueError('settle must be positive')
     structure = mcschematic.MCSchematic(str(schematic)).getStructure()
@@ -115,14 +127,15 @@ def generate(schematic,origin,destination,settle=400):
     if len(pins) != 28:
         raise ValueError(f'Expected 28 IO labels, found {pins}')
     vectors = test_vectors()
-    root = Path(destination)/'alu8_test'
-    functions = root/'data'/'alu8_test'/'function'
+    root = Path(destination)/namespace
+    functions = root/'data'/namespace/'function'
     functions.mkdir(parents=True,exist_ok=True)
     (root/'pack.mcmeta').write_text(json.dumps({'pack':{
         'description':'8-bit ALU carry, fan-out, reconvergence and isolation tests',
         'min_format':[121,0],'max_format':[121,0]}},indent=2)+'\n')
     def write(name,commands):
-        (functions/f'{name}.mcfunction').write_text('\n'.join(commands)+'\n')
+        (functions/f'{name}.mcfunction').write_text(
+            '\n'.join(command.replace('alu8_test',namespace) for command in commands)+'\n')
     low = tuple(min(p[axis] for p in structure.getBlockStates())+origin[axis] for axis in range(3))
     high = tuple(max(p[axis] for p in structure.getBlockStates())+origin[axis] for axis in range(3))
     first_x,last_x = low[0]//16,high[0]//16
@@ -203,6 +216,7 @@ if __name__ == '__main__':
     parser.add_argument('--origin',nargs=3,type=int,required=True)
     parser.add_argument('--settle',type=int,default=400)
     parser.add_argument('--netlist',type=Path,default=Path('output/alu8.json'))
+    parser.add_argument('--namespace',default='alu8_test')
     args = parser.parse_args()
     print(f'Netlist/reference checks passed: {verify_netlist(args.netlist,test_vectors())}')
-    generate(args.schematic,args.origin,args.datapacks,args.settle)
+    generate(args.schematic,args.origin,args.datapacks,args.settle,args.namespace)

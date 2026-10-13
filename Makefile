@@ -4,12 +4,23 @@ OUT_DIR = output
 
 # Default top module
 TOP = multiplexer4_1
+MAPPING ?= gates
+LUT_COSTS ?= 24,60,144,340
+ifeq ($(MAPPING),lut)
+MAP_COMMAND = abc -luts $(LUT_COSTS)
+SYNTH_OPTIONS = -noabc
+SUFFIX = _lut
+else ifeq ($(MAPPING),gates)
+MAP_COMMAND = abc -liberty $(LIB_FILE)
+else
+$(error MAPPING must be gates or lut)
+endif
 
 # Files
 # Search in current dir or tests/
 VERILOG_FILE = $(shell find . -name "$(TOP).v")
-OUTPUT_JSON = $(OUT_DIR)/$(TOP).json
-OUTPUT_PREFIX = $(OUT_DIR)/$(TOP)
+OUTPUT_JSON = $(OUT_DIR)/$(TOP)$(SUFFIX).json
+OUTPUT_PREFIX = $(OUT_DIR)/$(TOP)$(SUFFIX)
 
 # Default target
 all: prep synth
@@ -26,8 +37,8 @@ synth: prep $(VERILOG_FILE)
 	          hierarchy -check -top $(TOP); \
 	          flatten; \
 	          proc; opt; \
-	          synth -top $(TOP); \
-	          abc -liberty $(LIB_FILE); \
+	          synth -top $(TOP) $(SYNTH_OPTIONS); \
+	          $(MAP_COMMAND); \
 	          opt; clean; \
 	          json -o $(OUTPUT_JSON)"
 
