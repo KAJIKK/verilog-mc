@@ -102,8 +102,8 @@
     "num_outputs": 1,
     "input_offsets": {
       "S": 0,
-      "A": 2,
-      "B": 4
+      "A": 4,
+      "B": 2
     },
     "output_offsets": {
       "Y": 4

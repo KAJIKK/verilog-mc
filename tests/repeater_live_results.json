@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-22",
+  "minecraft_version": "26.3",
+  "world": "flat(1)",
+  "python_tests_passed": 65,
+  "optimized_live_checks_passed": 2285,
+  "optimized_live_checks_failed": 0,
+  "force_loaded_chunks_after_tests": 0,
+  "post_test_placement_audit": {
+    "namespace": "rpt_stress:audit",
+    "expected_blocks": 11372,
+    "missing_or_wrong_blocks": 0,
+    "unloaded_blocks": 0,
+    "mismatches": [],
+    "status": "complete",
+    "checks": "fixture supports and component block types, including repeater facing; transient power and wire connection states ignored"
+  },
+  "stress": {
+    "namespace": "rpt_stress",
+    "origin": [-1250, -60, 200],
+    "bounds": [[-1252, -62, 198], [-1062, -34, 492]],
+    "parallel_physical_fixtures": 121,
+    "leased_chunks": 247,
+    "steps": 51,
+    "settle_ticks": 84,
+    "scheduled_ticks": 4284,
+    "sprint_ticks": 4400,
+    "observed_sprint_ticks_per_second": 142,
+    "observed_sprint_ms_per_tick": 7.02,
+    "approximate_sprint_seconds": 31.0,
+    "optimized": {"passed": 445, "failed": 0, "status": "complete"},
+    "baseline": {
+      "passed": 434,
+      "failed": 6,
+      "status": "complete",
+      "failures": [
+        {"name": "loop_9_3", "step": 2, "inputs": [0]},
+        {"name": "loop_12_3", "step": 2, "inputs": [0]},
+        {"name": "loop_27_3", "step": 2, "inputs": [0]},
+        {"name": "loop_9_3", "step": 4, "inputs": [0]},
+        {"name": "loop_12_3", "step": 4, "inputs": [0]},
+        {"name": "loop_27_3", "step": 4, "inputs": [0]}
+      ]
+    },
+    "baseline_cannot_restore": ["only_landing_at_zero"],
+    "both_correctly_reject": ["two_sources_40", "impossible_staircase"],
+    "common_buildable_synthetic_fixtures": 35,
+    "common_synthetic_added_repeaters": {"baseline": 98, "optimized": 80},
+    "existing_router_fixtures": 25,
+    "existing_router_added_repeaters": {"baseline": 24, "optimized": 24}
+  },
+  "full_circuits": {
+    "parallel_physical_copies": 6,
+    "sprint_ticks": 133000,
+    "observed_sprint_ticks_per_second": 419,
+    "observed_sprint_ms_per_tick": 2.39,
+    "approximate_sprint_seconds": 317.4,
+    "adder4": {
+      "namespace": "rpt_adder",
+      "schematic": "adder4_rpt_opt.schem",
+      "origin": [-1030, -60, 600],
+      "added_repeaters": {"baseline": 30, "optimized": 29},
+      "fixed_gate_repeaters": 30,
+      "settle_ticks": 100,
+      "passed": 256,
+      "failed": 0,
+      "status": "complete"
+    },
+    "adder4_lut": {
+      "namespace": "rpt_addlut",
+      "schematic": "adder4_lut_rpt_opt.schem",
+      "origin": [-1030, -60, 680],
+      "added_repeaters": {"baseline": 10, "optimized": 10},
+      "fixed_gate_repeaters": 76,
+      "settle_ticks": 100,
+      "passed": 256,
+      "failed": 0,
+      "status": "complete"
+    },
+    "alu8_lut": {
+      "schematic": "alu8_lut_rpt_opt.schem",
+      "added_repeaters": {"baseline": 349, "optimized": 327},
+      "fixed_gate_repeaters": 631,
+      "physical_total_repeaters": {"baseline": 980, "optimized": 958},
+      "settle_ticks": 400,
+      "partition": "four contiguous, disjoint ranges covering all reference vectors",
+      "passed": 1328,
+      "failed": 0,
+      "shards": [
+        {"namespace": "rpt_alu0", "origin": [-1250, -60, 600], "first_case": 0, "cases": 332, "passed": 332, "failed": 0, "status": "complete"},
+        {"namespace": "rpt_alu1", "origin": [-1140, -60, 600], "first_case": 332, "cases": 332, "passed": 332, "failed": 0, "status": "complete"},
+        {"namespace": "rpt_alu2", "origin": [-1250, -60, 920], "first_case": 664, "cases": 332, "passed": 332, "failed": 0, "status": "complete"},
+        {"namespace": "rpt_alu3", "origin": [-1140, -60, 920], "first_case": 996, "cases": 332, "passed": 332, "failed": 0, "status": "complete"}
+      ]
+    }
+  }
+}

@@ -144,8 +144,11 @@ def generate(destination, origin=(-480, -60, 240)):
         manifests.append({'name': fixture['name'], 'dimensions': [circuit.size_x,circuit.size_y,circuit.size_z],
                           'stats': circuit.route_stats, 'repeaters': len(fixture['repeaters']),
                           'nets': circuit.net_pins})
+    from tests.live_test_runtime import install_chunk_lease
+    install_chunk_lease(write,'router_test',(origin[0]-1,origin[1]-1,origin[2]-2),
+                        (origin[0]+width,origin[1]+height+1,origin[2]+length+1))
     write('start', [f'schedule clear router_test:check_{i}' for i in range(len(steps))] + [
-        f'forceload add {origin[0]-1} {origin[2]-2} {origin[0]+width} {origin[2]+length+1}',
+        'function router_test:load',
         'scoreboard objectives add router_test dummy',
         'scoreboard players set #passed router_test 0',
         'scoreboard players set #failed router_test 0',
@@ -187,6 +190,7 @@ def generate(destination, origin=(-480, -60, 240)):
                    f'function router_test:apply_{i+1}' if i+1 < len(steps) else 'function router_test:finish']
         write(f'check_{i}', checks)
     write('finish', ['data modify storage router_test:results status set value "complete"',
+                    'function router_test:unload',
                     'execute store result storage router_test:results passed int 1 run scoreboard players get #passed router_test',
                     'execute store result storage router_test:results failed int 1 run scoreboard players get #failed router_test'])
     (root / 'manifest.json').write_text(json.dumps({'origin': origin, 'fixtures': manifests,

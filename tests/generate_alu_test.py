@@ -8,6 +8,7 @@ import re
 import mcschematic
 
 from tests.generate_adder_test import placement_commands
+from tests.live_test_runtime import install_chunk_lease,install_case_dispatch
 
 
 def reference(a,b,op):
@@ -92,10 +93,17 @@ def verify_netlist(path,vectors):
             args = {port:bit_value(bits[0]) for port,bits in cell['connections'].items()
                     if not is_output(cell,port)}
             a,b = args.get('A',False),args.get('B',False)
+            if cell['type'] == 'MC_MINTERM':
+                from lut_mapping import parameter_int
+                pattern = parameter_int(cell['parameters']['PATTERN'])
+                matched = all(args[port] == bool(pattern & (1<<i)) for i,port in enumerate('ABCD'[:len(args)]))
+                values[bit] = matched ^ bool(parameter_int(cell['parameters'].get('INVERT',0)))
+                active.remove(bit)
+                return values[bit]
             kind = cell['type'].upper().replace('$','').strip('_').removesuffix('2')
-            functions = {'BUF':lambda:a,'NOT':lambda:not a,'AND':lambda:a and b,
-                         'NAND':lambda:not(a and b),'OR':lambda:a or b,
-                         'NOR':lambda:not(a or b),'XOR':lambda:a != b,
+            functions = {'BUF':lambda:a,'NOT':lambda:not a,'AND':lambda:all(args.values()),
+                         'NAND':lambda:not all(args.values()),'OR':lambda:any(args.values()),
+                         'NOR':lambda:not any(args.values()),'XOR':lambda:a != b,
                          'XNOR':lambda:a == b,'MUX':lambda:b if args['S'] else a}
             values[bit] = bool(functions[kind]())
             active.remove(bit)
@@ -107,7 +115,7 @@ def verify_netlist(path,vectors):
     return len(vectors)
 
 
-def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
+def generate(schematic,origin,destination,settle=400,namespace='alu8_test',shard=None):
     if not re.fullmatch(r'[a-z0-9_]{1,16}',namespace):
         raise ValueError('Test namespace must be 1-16 lowercase letters, digits or underscores')
     if settle < 1:
@@ -127,6 +135,14 @@ def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
     if len(pins) != 28:
         raise ValueError(f'Expected 28 IO labels, found {pins}')
     vectors = test_vectors()
+    total_cases = len(vectors)
+    if shard is not None:
+        index,count = shard
+        if not 0 <= index < count <= total_cases:
+            raise ValueError('Shard must satisfy 0 <= index < count <= total cases')
+        # Contiguous ranges retain mode switching and ON/OFF sequence tests;
+        # striding by four would accidentally put each ALU op in its own lane.
+        vectors = vectors[total_cases*index//count:total_cases*(index+1)//count]
     root = Path(destination)/namespace
     functions = root/'data'/namespace/'function'
     functions.mkdir(parents=True,exist_ok=True)
@@ -138,15 +154,11 @@ def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
             '\n'.join(command.replace('alu8_test',namespace) for command in commands)+'\n')
     low = tuple(min(p[axis] for p in structure.getBlockStates())+origin[axis] for axis in range(3))
     high = tuple(max(p[axis] for p in structure.getBlockStates())+origin[axis] for axis in range(3))
-    first_x,last_x = low[0]//16,high[0]//16
-    first_z,last_z = low[2]//16,high[2]//16
-    chunk_rows = max(1,256//(last_x-first_x+1))
-    loads = [f'forceload add {low[0]} {z*16} {high[0]} {min(z+chunk_rows-1,last_z)*16}'
-             for z in range(first_z,last_z+1,chunk_rows)]
+    chunk_count = install_chunk_lease(write,namespace,low,high)
     placement = placement_commands(structure,origin)
     batches = [placement[i:i+10000] for i in range(0,len(placement),10000)]
     write('place',[f'schedule clear alu8_test:place_{i}' for i in range(len(batches))]+
-          loads+['data modify storage alu8_test:placement status set value "placing"',
+          ['function alu8_test:load','data modify storage alu8_test:placement status set value "placing"',
                  'function alu8_test:place_0'])
     for i,batch in enumerate(batches):
         following = ([f'schedule function alu8_test:place_{i+1} 1t replace']
@@ -154,11 +166,17 @@ def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
                      ['data modify storage alu8_test:placement status set value "complete"',
                       'tellraw @a {"text":"ALU8 placement complete"}'])
         write(f'place_{i}',batch+following)
-    write('start',['schedule clear alu8_test:check','scoreboard objectives add alu8_test dummy',
+    write('start',['function alu8_test:load','schedule clear alu8_test:check','scoreboard objectives add alu8_test dummy',
                    'scoreboard players set #passed alu8_test 0','scoreboard players set #failed alu8_test 0',
                    'data modify storage alu8_test:results failures set value []',
+                   'data modify storage alu8_test:results passed set value 0',
+                   'data modify storage alu8_test:results failed set value 0',
+                   'data modify storage alu8_test:results checked set value 0',
                    'data modify storage alu8_test:results status set value "running"',
                    'function alu8_test:apply_0'])
+    write('stop',['schedule clear alu8_test:check',
+                  'data modify storage alu8_test:results status set value "stopped"',
+                  'function alu8_test:unload'])
     previous = None
     for i,vector in enumerate(vectors):
         apply = [f'scoreboard players set #{name} alu8_test {vector[name]}'
@@ -189,22 +207,25 @@ def generate(schematic,origin,destination,settle=400,namespace='alu8_test'):
                'execute if score #ok alu8_test matches 0 run function alu8_test:fail',
                'scoreboard players add #case alu8_test 1',
                'execute store result storage alu8_test:results checked int 1 run scoreboard players get #case alu8_test']
-    checks += [f'execute if score #case alu8_test matches {i} run function alu8_test:apply_{i}'
-               for i in range(1,len(vectors))]
-    checks.append(f'execute if score #case alu8_test matches {len(vectors)} run function alu8_test:finish')
+    checks += [f'execute store result storage alu8_test:results {name} int 1 run scoreboard players get #{name} alu8_test'
+               for name in ('passed','failed')]
+    checks += install_case_dispatch(write,'alu8_test',len(vectors))
     write('check',checks)
     write('fail',['execute if score #failed alu8_test matches ..31 run function alu8_test:record_failure',
                   'scoreboard players add #failed alu8_test 1'])
     write('record_failure',['data modify storage alu8_test:results failures append value {}']+
           [f'execute store result storage alu8_test:results failures[-1].{name} int 1 run scoreboard players get #{name} alu8_test'
            for name in ('case','a','b','op','result','zero','actual','actual_zero')])
-    write('finish',['data modify storage alu8_test:results status set value "complete"']+
+    write('finish',['data modify storage alu8_test:results status set value "complete"',
+                    'function alu8_test:unload']+
           [f'execute store result storage alu8_test:results {name} int 1 run scoreboard players get #{name} alu8_test'
            for name in ('passed','failed')]+[
           'tellraw @a [{"text":"ALU8 test complete. Passed: "},{"score":{"name":"#passed","objective":"alu8_test"}},{"text":"; failed: "},{"score":{"name":"#failed","objective":"alu8_test"}}]'])
     manifest = {'origin':origin,'pins':pins,'bounds':[low,high],'vectors':vectors,
+                'shard':shard,'total_cases':total_cases,
                 'cases':len(vectors),'settle_ticks':settle,'sprint_ticks':len(vectors)*settle+200,
-                'placement_batches':len(batches)}
+                'placement_batches':len(batches),'leased_chunks':chunk_count,
+                'dispatch':'macro','automatic_chunk_cleanup':True}
     (root/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({k:v for k,v in manifest.items() if k != 'vectors'},indent=2))
 
@@ -217,6 +238,8 @@ if __name__ == '__main__':
     parser.add_argument('--settle',type=int,default=400)
     parser.add_argument('--netlist',type=Path,default=Path('output/alu8.json'))
     parser.add_argument('--namespace',default='alu8_test')
+    parser.add_argument('--shard',nargs=2,type=int,metavar=('INDEX','COUNT'),
+                        help='Contiguous subset on an independent parallel circuit copy (zero-based)')
     args = parser.parse_args()
     print(f'Netlist/reference checks passed: {verify_netlist(args.netlist,test_vectors())}')
-    generate(args.schematic,args.origin,args.datapacks,args.settle,args.namespace)
+    generate(args.schematic,args.origin,args.datapacks,args.settle,args.namespace,args.shard)

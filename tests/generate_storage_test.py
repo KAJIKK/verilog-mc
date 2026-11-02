@@ -3,6 +3,7 @@ import argparse
 import json
 import random
 from pathlib import Path
+from tests.live_test_runtime import install_chunk_lease
 
 
 ORIGINS = {'SR_LATCH': (-400, -60, 164), 'T_LATCH': (-390, -60, 164)}
@@ -41,7 +42,10 @@ def generate(destination, library=Path('gates.json')):
             setup.append(f'setblock {pos(name,x,0,gate["size"][2]+2)} redstone_lamp')
             setup.append(f'setblock {pos(name,x,0,gate["size"][2]+1)} redstone_wire')
             setup.append(f'setblock {pos(name,x,0,gate["size"][2])} redstone_wire')
-    write('place', setup)
+    low = (min(o[0]-1 for o in ORIGINS.values()),-61,min(o[2]-2 for o in ORIGINS.values()))
+    high = (max(o[0]+3 for o in ORIGINS.values()),-57,max(o[2]+6 for o in ORIGINS.values()))
+    install_chunk_lease(write,'storage_test',low,high)
+    write('place',['function storage_test:load']+setup)
 
     steps = []
     def add(name, label, changes=None, expected=None, wait=40, category='normal'):
@@ -151,7 +155,7 @@ def generate(destination, library=Path('gates.json')):
             commands.append('execute if score #ok storage_test matches 0 run data modify storage storage_test:results failures append from storage storage_test:results entries[-1]')
         commands.append(f'function storage_test:apply_{i+1}' if i+1 < len(steps) else 'function storage_test:finish')
         write(f'check_{i}', commands)
-    finish = ['data modify storage storage_test:results status set value "complete"']
+    finish = ['data modify storage storage_test:results status set value "complete"','function storage_test:unload']
     for name in ORIGINS:
         for result in ('passed', 'failed'):
             match = 1 if result == 'passed' else 0

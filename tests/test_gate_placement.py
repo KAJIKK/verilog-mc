@@ -16,7 +16,7 @@ class GatePlacementTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             ic.load_graph(graph)
             ic.build_gates()
-            ic.route_channels(workers=1,placement=placement)
+            ic.route_channels(workers=1,placement=placement,cache=False)
         return ic
 
     def test_data_enable_align_without_swapping_named_roles(self):

@@ -167,7 +167,7 @@ class HeightRouterTests(unittest.TestCase):
             ic.load_graph(graph)
             ic.build_gates()
             with contextlib.redirect_stdout(io.StringIO()):
-                ic.route_channels(workers=workers)
+                ic.route_channels(workers=workers,cache=False)
             return [(c.circuit.blocks,c.circuit.net_pins) for c in ic.channels]
         self.assertEqual(build(1),build(2))
 

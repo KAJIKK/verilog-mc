@@ -104,6 +104,8 @@ class _Layout:
         self.layer_stride = width * length
         self._neighbors = {}
         self._bits = {}
+        self._adjacent_bits = {}
+        self._wire_support_bits = {}
         self._static_cache = {}
         self._cache_owner = None
         self.near_nets = {}
@@ -160,6 +162,9 @@ class _Layout:
                     mask[q] = mask.get(q,0) | owner_bit
 
     def adjacent_bits(self, p):
+        cached = self._adjacent_bits.get(p)
+        if cached is not None:
+            return cached
         x,y,z = p
         bit = self.bit(p)
         horizontal = 0
@@ -171,7 +176,9 @@ class _Layout:
             horizontal |= bit >> self.width
         if z+1 < self.length:
             horizontal |= bit << self.width
-        return horizontal | (horizontal << self.layer_stride) | (horizontal >> self.layer_stride)
+        result = horizontal | (horizontal << self.layer_stride) | (horizontal >> self.layer_stride)
+        self._adjacent_bits[p] = result
+        return result
 
     def _static_valid(self, pos, owner):
         if self._cache_owner != owner:
@@ -206,8 +213,14 @@ class _Layout:
         if not self._static_valid(pos,owner):
             return False
         wires, clear = local
-        wire = self.bit(pos)
-        support = wire >> self.layer_stride
+        if not (wires or clear):
+            return True
+        geometry = self._wire_support_bits.get(pos)
+        if geometry is None:
+            wire = self.bit(pos)
+            geometry = wire,wire >> self.layer_stride
+            self._wire_support_bits[pos] = geometry
+        wire,support = geometry
         return not (wire & (wires | clear | (wires >> self.layer_stride)) or
                     support & (wires | clear))
 
@@ -267,14 +280,14 @@ def _distance(pos, target):
 def _routing_potential(layout, owner, tree, target):
     """Reverse flood through static legal geometry, for congested channels."""
     empty = (0,0)
-    if target not in tree and not layout.valid(target,owner,empty):
+    if target not in tree and not layout._static_valid(target,owner):
         return {}
     distances, queue = {target:0}, deque([target])
     while queue:
         current = queue.popleft()
         x,y,z = current
         for p in layout.neighbors(current):
-            if p in distances or (p not in tree and not layout.valid(p,owner,empty)):
+            if p in distances or (p not in tree and not layout._static_valid(p,owner)):
                 continue
             if z in (0,layout.length-1) or p[2] in (0,layout.length-1):
                 if p[0] != x or p[1] != y:

@@ -9,6 +9,10 @@ import re
 from pathlib import Path
 
 import mcschematic
+if __package__:
+    from .live_test_runtime import install_chunk_lease
+else:
+    from live_test_runtime import install_chunk_lease
 
 
 def fill_commands(low, high, origin, block='minecraft:air'):
@@ -77,11 +81,17 @@ def generate(schematic, origin, destination, namespace='adder4_test'):
         (functions / f"{name}.mcfunction").write_text(
             "\n".join(command.replace('adder4_test',namespace) for command in commands) + "\n")
 
+    positions = structure.getBlockStates()
+    low = tuple(min(p[i] for p in positions)+origin[i] for i in range(3))
+    high = tuple(max(p[i] for p in positions)+origin[i] for i in range(3))
+    install_chunk_lease(write,namespace,low,high)
+
     # Optional exact-origin placement, independent of the player's movement.
     # Existing WorldEdit workflows still call start after their own paste.
-    write('place',placement_commands(structure,origin))
+    write('place',['function adder4_test:load']+placement_commands(structure,origin))
 
     write("start", [
+        'function adder4_test:load',
         "schedule clear adder4_test:check",
         "scoreboard objectives add adder4_test dummy",
         "scoreboard players set #case adder4_test 0",
@@ -139,6 +149,7 @@ def generate(schematic, origin, destination, namespace='adder4_test'):
         fail.append(f"execute store result storage adder4_test:results failures[-1].{name} int 1 run scoreboard players get #{name} adder4_test")
     write("fail", fail)
     write("finish", [
+        'function adder4_test:unload',
         "data modify storage adder4_test:results status set value \"complete\"",
         "execute store result storage adder4_test:results passed int 1 run scoreboard players get #passed adder4_test",
         "execute store result storage adder4_test:results failed int 1 run scoreboard players get #failed adder4_test",

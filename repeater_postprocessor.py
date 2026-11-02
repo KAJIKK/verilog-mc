@@ -259,7 +259,7 @@ def get_downstream(start_node, graph):
                     stack.append(npos)
     return downstream
 
-def build_graph(block_map, sources):
+def build_graph_baseline(block_map, sources):
     """Restore long lines with directional repeaters on flat straight dust.
 
     Rebuild power after each placement rather than resetting an undirected
@@ -348,6 +348,189 @@ def build_graph(block_map, sources):
                 'is_eligible': is_eligible(pos, block_map)})
             entry['power'] = max(entry['power'], power)
     return final_graph, repeaters
+
+
+def _tree_repeaters(signals, parents, order, source_power, eligible, prefer_early=False):
+    """Minimum added repeaters on a rooted electrical tree, in O(16 * wires).
+
+    A state is the power dust would have at a node. State zero can still host
+    a repeater: its preceding dust has power one, sufficient to drive it.
+    Repeaters restore their output dust to 15 without a dust-to-dust loss.
+    """
+    children = {p: [] for p in order}
+    for p in order[1:]:
+        children[parents[p]].append(p)
+    infinity = len(order)+1
+    costs, placements = {}, {}
+    for p in reversed(order):
+        child_costs = [costs[c] for c in children[p]]
+        restored = sum(table[15] for table in child_costs)
+        if signals[p] is not None:
+            costs[p] = [restored]*16
+            continue
+        keep = [infinity]+[sum(table[power-1] for table in child_costs)
+                           for power in range(1,16)]
+        # Candidate direction must follow the tree; no turns, branches, slopes,
+        # source pins, or existing gate components may be replaced.
+        if p in eligible and parents[p] is not None and len(children[p]) == 1:
+            before,after = parents[p],children[p][0]
+            delta = (after[0]-p[0],after[2]-p[2])
+            if before == (p[0]-delta[0],p[1],p[2]-delta[1]) and after[1] == p[1]:
+                placements[p] = (1+restored,delta)
+                costs[p] = [min(value,1+restored) for value in keep]
+                continue
+        costs[p] = keep
+    if costs[order[0]][source_power] >= infinity:
+        raise ValueError(f'No powered flat straight repeater site from {order[0]}; '
+                         'add a landing to this route')
+    result = {}
+    pending = [(order[0],source_power)]
+    while pending:
+        p,power = pending.pop()
+        fixed = signals[p] is not None
+        candidate = placements.get(p)
+        keep = (sum(costs[c][power-1] for c in children[p]) if power > 0 else infinity)
+        replace = (not fixed and candidate is not None and
+                   (candidate[0] < keep or (prefer_early and candidate[0] == keep)))
+        if replace:
+            result[p] = candidate[1]
+        child_power = 15 if fixed or replace else power-1
+        pending.extend((c,child_power) for c in children[p])
+    return result
+
+
+def _repeater_feedback(signals, solids, added):
+    """Detect sustainable feedback, including attenuation around dust cycles.
+
+    Dust-only cycles decay after switch-off. A directional cycle containing a
+    repeater can latch on; ordinary source-on reachability cannot detect that.
+    Existing gate feedback is preserved, but restoration must not create it.
+    """
+    from redstone_geometry import signal_neighbors,signal_powers
+    for repeater in added:
+        dx,dz = signals[repeater]
+        input_pos = (repeater[0]-dx,repeater[1],repeater[2]-dz)
+        # Energize ONLY this repeater, with all external sources absent. If its
+        # output (possibly through other repeaters) powers its input, it latches.
+        # A long dust-only return path can decay to zero and is entirely safe.
+        powers = signal_powers(signals,solids,repeater)
+        if (powers.get(input_pos,0) > 0 and
+                repeater in signal_neighbors(input_pos,signals,solids)):
+            return repeater
+    return None
+
+
+def build_graph(block_map, sources):
+    """Minimize independent trees; compare cyclic heuristics and prune shared nets.
+
+    Gate repeaters are immutable. Every originally reachable signal block must
+    remain powered from EACH original source, not merely from their union.
+    The original greedy algorithm remains available as build_graph_baseline.
+    """
+    from redstone_geometry import signal_neighbors, signal_powers, FACING
+    directions = {name: get_offset(get_opposite(name)) for name in ('north','south','east','west')}
+    signals = {}
+    for p,block in block_map.items():
+        bid,props = parse_state(block)
+        if bid == 'minecraft:redstone_wire':
+            signals[p] = None
+        elif bid == 'minecraft:repeater':
+            dx,_,dz = directions[props.get('facing','north')]
+            signals[p] = (dx,dz)
+    solids = {p for p,block in block_map.items() if p not in signals and
+              not any(name in block for name in ('air','torch','lever','sign'))}
+    adjacency = {p:tuple(signal_neighbors(p,signals,solids)) for p in signals}
+    source_positions = {p for p,_,_ in sources}
+    eligible = {p for p,value in signals.items()
+                if value is None and p not in source_positions and is_eligible(p,block_map)}
+    routes,owners = [],{}
+    for source,power,_ in sources:
+        if source not in signals:
+            continue
+        if not 1 <= power <= 15:
+            raise ValueError('Source power must be between 1 and 15')
+        parents,order,tree = {source:None},[source],True
+        for p in order:
+            for q in adjacency[p]:
+                if q not in parents:
+                    parents[q] = p
+                    order.append(q)
+                elif parents[p] != q and parents[q] != p:
+                    tree = False
+        index = len(routes)
+        routes.append((source,power,parents,order,tree))
+        for p in order:
+            owners.setdefault(p,[]).append(index)
+
+    added, prunable, fallback_sources = {},{},[]
+    for source,power,parents,order,tree in routes:
+        if all(len(owners[p]) == 1 for p in order):
+            # On a cycle this optimizes a spanning tree, not the entire graph.
+            # Favor a tied shared upstream placement over boosting a loop arm.
+            if tree:
+                added.update(_tree_repeaters(signals,parents,order,power,eligible))
+                continue
+            options = []
+            try:
+                options.append(_tree_repeaters(signals,parents,order,power,eligible,True))
+            except ValueError:
+                pass
+            try:
+                _,greedy = build_graph_baseline(block_map,[(source,power,'south')])
+                inverse = {facing:delta for delta,facing in FACING.items()}
+                options.append({p:inverse[facing] for p,facing in greedy.items()})
+            except ValueError:
+                pass
+            for candidate in sorted(options,key=len):
+                trial = signals.copy()
+                trial.update(candidate)
+                powers = signal_powers(trial,solids,source,power)
+                if (all(powers.get(p,0) > 0 for p in parents) and
+                        _repeater_feedback(trial,solids,candidate) is None):
+                    added.update(candidate)
+                    prunable.update({p:FACING[d] for p,d in candidate.items()})
+                    break
+            else:
+                raise ValueError(f'No feedback-free restoration found for cyclic route from {source}')
+        else:
+            fallback_sources.append((source,power,'south'))
+    if fallback_sources:
+        _,greedy = build_graph_baseline(block_map,fallback_sources)
+        prunable.update(greedy)
+        inverse = {facing:delta for delta,facing in FACING.items()}
+        added.update({p:inverse[facing] for p,facing in greedy.items()})
+    signals.update(added)
+    # Shared roots and cycles are not trees. Remove a greedy insertion only if
+    # every affected root still powers its entire original reachable network.
+    for p in sorted(prunable):
+        direction = signals[p]
+        signals[p] = None
+        for index in owners[p]:
+            source,power,parents,_,_ = routes[index]
+            powers = signal_powers(signals,solids,source,power)
+            if any(powers.get(q,0) == 0 for q in parents):
+                signals[p] = direction
+                break
+        else:
+            if _repeater_feedback(signals,solids,(q for q in added if q != p)) is None:
+                del added[p]
+            else:
+                signals[p] = direction
+    feedback = _repeater_feedback(signals,solids,added)
+    if feedback is not None:
+        raise ValueError(f'Repeater would create self-sustaining feedback at {feedback}; '
+                         'split the loop into directional branches')
+    final_graph = {}
+    for source,power,parents,_,_ in routes:
+        powers = signal_powers(signals,solids,source,power)
+        if any(powers.get(p,0) == 0 for p in parents):
+            raise ValueError(f'Repeater placement broke a source route at {source}')
+        for p,value in powers.items():
+            entry = final_graph.setdefault(p,{'pos':p,'power':0,
+                'connections':list(signal_neighbors(p,signals,solids)),
+                'is_eligible':p in eligible})
+            entry['power'] = max(entry['power'],value)
+    return final_graph,{p:FACING[direction] for p,direction in added.items()}
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

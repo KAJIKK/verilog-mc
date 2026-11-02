@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-22",
+  "minecraft_version": "26.3",
+  "yosys_version": "0.66",
+  "world": "flat(1)",
+  "comparison": "Same ALU RTL and repeater postprocessor; best previous pure-LUT mapping versus selected hybrid mapping",
+  "alu8": {
+    "pure_lut_baseline": {
+      "netlist": "output/alu8_lut.json",
+      "schematic": "alu8_lut_rpt_opt.schem",
+      "abc_lut_costs": [24, 60, 144, 340],
+      "lut_macros": 35,
+      "native_gates": 0,
+      "relay_cells": 79,
+      "dimensions": [81, 8, 290],
+      "footprint": 23490,
+      "fixed_repeaters": 631,
+      "routing_repeaters": 327,
+      "total_repeaters": 958,
+      "dust_blocks": 9470,
+      "torches": 649
+    },
+    "selected_hybrid": {
+      "build": "make TOP=alu8 MAPPING=hybrid",
+      "netlist": "output/alu8_hybrid.json",
+      "schematic": "alu8_hybrid.schem",
+      "abc_lut_costs": [24, 60, 144],
+      "gate_cost_scale": 1.0,
+      "raw_abc_luts": 68,
+      "lut_macros": 27,
+      "lut_widths": {"2": 5, "3": 22},
+      "native_gates": 20,
+      "native_gate_types": {"MC_MINTERM": 11, "NOR": 4, "OR": 4, "AND": 1},
+      "relay_cells": 125,
+      "layers": 12,
+      "dimensions": [81, 8, 266],
+      "footprint": 21546,
+      "fixed_repeaters": 443,
+      "routing_repeaters": 346,
+      "total_repeaters": 789,
+      "dust_blocks": 8452,
+      "torches": 440,
+      "footprint_reduction_percent": 8.275862068965518,
+      "total_repeater_reduction_percent": 17.640918580375782,
+      "cold_routing_seconds": 43.018201056002,
+      "postprocessing_seconds": 0.3070482900002389,
+      "observed_synthesis_two_maps_packing_and_selection_seconds": 4.977,
+      "candidate_layout_proxies": [
+        {"abc_lut_costs": [24, 60, 144, 340], "dimensions": [79, 248], "footprint": 19592, "selected": false},
+        {"abc_lut_costs": [24, 60, 144], "dimensions": [81, 200], "footprint": 16200, "selected": true}
+      ],
+      "formal_equivalence": {
+        "passed": true,
+        "method": "Yosys equiv_simple; equiv_status -assert against original alu8.v",
+        "proven_output_bits": 10,
+        "unproven_output_bits": 0,
+        "input_combinations_covered": 262144,
+        "log": "output/alu8_hybrid.equiv.log"
+      },
+      "live_test": {
+        "passed": 1328,
+        "failed": 0,
+        "settle_ticks": 400,
+        "partition": "four disjoint contiguous ranges, 332 vectors each",
+        "shards": [
+          {"namespace": "hyb_alu0", "origin": [-1530, -60, 600], "passed": 332, "failed": 0, "status": "complete"},
+          {"namespace": "hyb_alu1", "origin": [-1420, -60, 600], "passed": 332, "failed": 0, "status": "complete"},
+          {"namespace": "hyb_alu2", "origin": [-1530, -60, 920], "passed": 332, "failed": 0, "status": "complete"},
+          {"namespace": "hyb_alu3", "origin": [-1420, -60, 920], "passed": 332, "failed": 0, "status": "complete"}
+        ]
+      }
+    },
+    "additional_measured_candidate": {
+      "netlist": "output/alu8_lut3_hybrid_s1.json",
+      "description": "Hybrid packing of earlier uniform three-input ABC mapping",
+      "dimensions": [87, 8, 250],
+      "footprint": 21750,
+      "fixed_repeaters": 464,
+      "routing_repeaters": 324,
+      "total_repeaters": 788,
+      "formal_equivalence_passed": true,
+      "full_minecraft_test_run": false
+    }
+  },
+  "adder4": {
+    "build": "make TOP=adder4 MAPPING=hybrid",
+    "netlist": "output/adder4_hybrid.json",
+    "schematic": "adder4_hybrid.schem",
+    "selected_abc_lut_costs": [24, 60, 144, 340],
+    "candidate_layout_proxies": [
+      {"abc_lut_costs": [24, 60, 144, 340], "dimensions": [30, 42], "footprint": 1260, "selected": true},
+      {"abc_lut_costs": [24, 60, 144], "dimensions": [29, 68], "footprint": 1972, "selected": false}
+    ],
+    "lut_macros": 3,
+    "native_gates": 0,
+    "dimensions": [30, 6, 46],
+    "footprint": 1380,
+    "fixed_repeaters": 76,
+    "routing_repeaters": 10,
+    "total_repeaters": 86,
+    "formal_equivalence_passed": true,
+    "formal_log": "output/adder4_hybrid.equiv.log",
+    "live_test": {"namespace": "hyb_adder", "origin": [-1300, -60, 600], "settle_ticks": 100, "passed": 256, "failed": 0, "status": "complete"}
+  },
+  "primitive_live_test": {
+    "namespace": "hybrid_prims",
+    "origin": [-1390, -60, 200],
+    "parallel_circuits": 76,
+    "passed": 2432,
+    "failed": 0,
+    "status": "complete",
+    "settle_ticks": 24,
+    "sprint_ticks": 1000,
+    "coverage": "All two- through four-input minterm patterns and both output polarities; AND/NAND/OR/NOR widths 1-4; NOT/XOR/XNOR/MUX. All addresses forward and reverse.",
+    "mux_fix": "Existing blueprint's physical A/B pin labels were swapped. Corrected input_offsets; exhaustive truth test rerun successfully."
+  },
+  "validation_summary": {
+    "python_tests_passed": 75,
+    "optimized_live_checks_passed": 4016,
+    "optimized_live_checks_failed": 0,
+    "force_loaded_chunks_after_tests": 0,
+    "parallel_full_circuit_copies": 5,
+    "full_circuit_sprint_ticks": 133000,
+    "observed_full_circuit_ticks_per_second": 344,
+    "observed_full_circuit_ms_per_tick": 2.90,
+    "approximate_full_circuit_sprint_seconds": 386.6,
+    "timing_note": "World/client-load dependent; independent circuits still share Minecraft's server thread. The 400-tick ALU settling allowance was retained."
+  }
+}

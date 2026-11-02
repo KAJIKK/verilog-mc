@@ -4,6 +4,9 @@
 !*.py
 !**/*.py
 !tests
+!tests/repeater_results.json
+!tests/repeater_live_results.json
+!tests/hybrid_results.json
 !.gitignore
 !Makefile
 !*.lib

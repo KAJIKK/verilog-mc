@@ -46,10 +46,14 @@ class Graph:
             for n in v.next:
                 print(f"  -> {n.name}")
 
-def parse_yosys_json(filepath, *, pack_luts=True):
+def parse_yosys_json(filepath, *, pack_luts=True,hybrid_luts=False,gate_cost_scale=1.0):
     with open(filepath, 'r') as f:
         data = json.load(f)
-        
+    return parse_yosys_data(data,pack_luts=pack_luts,hybrid_luts=hybrid_luts,gate_cost_scale=gate_cost_scale)
+
+
+def parse_yosys_data(data, *, pack_luts=True,hybrid_luts=False,gate_cost_scale=1.0):
+    """Parse an in-memory netlist as well as generated JSON files."""
     graph = Graph()
     
     modules = data.get("modules", {})
@@ -67,7 +71,11 @@ def parse_yosys_json(filepath, *, pack_luts=True):
     
     ports = module_data.get("ports", {})
     from lut_mapping import pack_lut_cells,decode_lut
-    cells,graph.lut_stats = pack_lut_cells(module_data,pack_luts)
+    mapped = attribute_set(module_data,'mc_hybrid_mapped')
+    cells,graph.lut_stats = pack_lut_cells(module_data,pack_luts and not mapped,
+                                         hybrid=hybrid_luts and not mapped,gate_cost_scale=gate_cost_scale)
+    if mapped:
+        graph.lut_stats = json.loads(module_data['attributes']['mc_mapping_stats'])
     
     bit_drivers = {}
     bit_readers = {}
@@ -100,7 +108,7 @@ def parse_yosys_json(filepath, *, pack_luts=True):
         port_directions = cell_info.get("port_directions", {})
         
         v = Vertex(cell_name, VertexType.FUNCTION, func_type=cell_type,
-                   input_bits={}, output_bits={}, bits=[])
+                   input_bits={}, output_bits={}, bits=[],parameters=cell_info.get('parameters',{}))
         graph.add_vertex(v)
 
         if cell_type == 'MC_LUT':

@@ -2,12 +2,15 @@ from netlist_parser import VertexType, Vertex, Graph
 from router import route as route_new
 from logic_gates import LogicGates, Circuit
 
-def parallel_route_worker(nets_in, tgl, bgl, ncx, channel_idx, pin_headroom=()):
+def parallel_route_worker(nets_in, tgl, bgl, ncx, channel_idx, pin_headroom=(), cache=True):
     from time import perf_counter
     started = perf_counter()
     if nets_in:
-        from router import route as route_new
-        circuit = route_new(nets_in, min_width=max(1,ncx), pin_headroom=pin_headroom)
+        if cache:
+            from route_cache import cached_route
+            circuit = cached_route(nets_in,min_width=max(1,ncx),pin_headroom=pin_headroom)
+        else:
+            circuit = route_new(nets_in, min_width=max(1,ncx), pin_headroom=pin_headroom)
     else:
         circuit = Circuit(ncx, 3, 1)
         circuit.route_stats = {'attempts': 0}
@@ -202,7 +205,15 @@ class IntermediateCircuit:
         if ft == 'RELAY': return LogicGates.relay()
         if ft == 'LUT':
             return LogicGates.lut_gate(len(v.input_bits),len(v.output_bits),v.lut_data)
-        num_in = getattr(v, 'num_inputs', max(1, len(v.before)))
+        if ft == 'MC_MINTERM':
+            from lut_mapping import parameter_int
+            return LogicGates.minterm_gate(parameter_int(v.parameters['WIDTH']),
+                                           parameter_int(v.parameters['PATTERN']),
+                                           bool(parameter_int(v.parameters.get('INVERT',0))))
+        # A multi-output LUT can drive several primitive inputs. Count physical
+        # signal pins, not predecessor vertices, which are deduplicated.
+        num_in = getattr(v, 'num_inputs', sum(len(bits) for bits in getattr(v,'input_bits',{}).values())
+                         or max(1,len(v.before)))
         if ft in ['AND', 'AND2', '_AND_']: return LogicGates.and_gate(num_in)
         if ft in ['NAND', 'NAND2', '_NAND_']: return LogicGates.nand_gate(num_in)
         if ft in ['OR', 'OR2', '_OR_']: return LogicGates.or_gate(num_in)
@@ -478,7 +489,8 @@ class IntermediateCircuit:
         self.placement_stats = {'method':'compact','row_width_budget':width,
                                 'estimated_wiring_cost':best_score}
 
-    def route_channels(self, workers=None, placement='compact'):
+    def prepare_routing_jobs(self, placement='compact'):
+        """Place gates and expose lightweight jobs for routing/profiling."""
         self.place_gates(placement)
         # Phase 2: Pre-calculate routing inputs sequentially
         num_channels = len(self.vertex_layers) - 1
@@ -554,6 +566,11 @@ class IntermediateCircuit:
             # avoid serializing complete gate blueprints for every channel.
             routing_jobs.append((nets_in, None, None, ncx, i, pin_headroom))
 
+        return routing_jobs
+
+    def route_channels(self, workers=None, placement='compact', cache=True):
+        routing_jobs = self.prepare_routing_jobs(placement)
+        num_channels = len(routing_jobs)
         # Phase 3: Route channels in parallel using ProcessPoolExecutor
         from concurrent.futures import ProcessPoolExecutor, as_completed
         from os import cpu_count
@@ -566,16 +583,17 @@ class IntermediateCircuit:
             print(f'  Channel {index+1}/{num_channels}: '
                   f'{circuit.size_x}x{circuit.size_y}x{circuit.size_z}, '
                   f'{circuit.route_stats["seconds"]:.3f}s, '
-                  f'{circuit.route_stats["attempts"]} attempts', flush=True)
+                   f'{circuit.route_stats["attempts"]} attempts'
+                   f'{", cache hit" if circuit.route_stats.get("cached") else ""}', flush=True)
         if routing_jobs:
             print(f'Routing {num_channels} channels with {worker_count} worker(s)...', flush=True)
         if worker_count == 1:
             for i, job in enumerate(routing_jobs):
-                completed(i, parallel_route_worker(*job))
+                completed(i, parallel_route_worker(*job,cache=cache))
         elif routing_jobs:
             with ProcessPoolExecutor(max_workers=worker_count) as executor:
                 futures = {
-                    executor.submit(parallel_route_worker, *job): job[4]
+                    executor.submit(parallel_route_worker, *job, cache=cache): job[4]
                     for job in routing_jobs
                 }
                 for future in as_completed(futures):

@@ -170,6 +170,27 @@ class LogicGates:
         return gate
 
     @staticmethod
+    def minterm_gate(inputs,pattern,invert=False):
+        """AND/NAND of selected input polarities, without extra inverter rows.
+
+        Positive literals enter the original wool/torch interface at Y=0.
+        Negative literals bypass that torch with an input repeater at Y=1.
+        Buffering is essential: dust here would let the shared OR bus feed back
+        into other input nets. Named pins retain the physically distinct roles.
+        """
+        if not 1 <= inputs <= 4 or not 0 <= pattern < (1<<inputs):
+            raise ValueError('Invalid minterm width or pattern')
+        gate = LogicGates.nand_gate(inputs) if invert else LogicGates.and_gate(inputs)
+        gate.input_offsets = {}
+        for i in range(inputs):
+            positive = bool(pattern & (1<<i))
+            if not positive:
+                gate.set_block(2*i,1,0,'minecraft:repeater[facing=north]')
+            gate.input_offsets['ABCD'[i]] = [2*i,0 if positive else 1]
+        gate.output_offsets = {'Y':[0,0]}
+        return gate
+
+    @staticmethod
     def or_gate(inputs):
         if inputs == 0:
             raise ValueError("Gate cannot have 0 inputs")

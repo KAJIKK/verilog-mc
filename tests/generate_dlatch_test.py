@@ -7,8 +7,10 @@ from pathlib import Path
 import mcschematic
 if __package__:
     from .generate_adder_test import placement_commands
+    from .live_test_runtime import install_chunk_lease
 else:
     from generate_adder_test import placement_commands
+    from live_test_runtime import install_chunk_lease
 
 
 def test_sequence():
@@ -79,11 +81,16 @@ def generate(schematic, origin, destination):
     def write(name, commands):
         (functions / f"{name}.mcfunction").write_text("\n".join(commands) + "\n")
 
-    write('place',placement_commands(structure,origin))
+    positions = structure.getBlockStates()
+    low = tuple(min(p[i] for p in positions)+origin[i] for i in range(3))
+    high = tuple(max(p[i] for p in positions)+origin[i] for i in range(3))
+    install_chunk_lease(write,'dlatch_test',low,high)
+    write('place',['function dlatch_test:load']+placement_commands(structure,origin))
     steps = test_sequence()
     write("start", [
         f"schedule clear dlatch_test:check_{i}" for i in range(len(steps))
     ] + [
+        'function dlatch_test:load',
         "scoreboard objectives add dlatch_test dummy",
         "scoreboard players set #passed dlatch_test 0",
         "scoreboard players set #failed dlatch_test 0",
@@ -152,6 +159,7 @@ def generate(schematic, origin, destination):
                      else "function dlatch_test:finish")
         write(f"check_{i}", check)
     write("finish", [
+        'function dlatch_test:unload',
         'data modify storage dlatch_test:results status set value "complete"',
         f"data modify storage dlatch_test:results total set value {assertions}",
         "execute store result storage dlatch_test:results passed int 1 run scoreboard players get #passed dlatch_test",

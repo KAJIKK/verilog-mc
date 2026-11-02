@@ -70,7 +70,11 @@ def resolve_redstone_wires(block_map):
 def generate_circuit_schematic(json_filepath, filename):
     print(f"Parsing {json_filepath}...")
     graph = netlist_parser.parse_yosys_json(json_filepath)
-    if graph.lut_stats:
+    if graph.lut_stats.get('mapping') == 'hybrid':
+        print(f'Hybrid mapping: {graph.lut_stats["original_luts"]} original LUTs -> '
+              f'{graph.lut_stats["packed_luts"]} LUT macros + '
+              f'{graph.lut_stats["primitive_cells"]} native gates')
+    elif graph.lut_stats:
         print(f'LUT packing: {graph.lut_stats["original_luts"]} mapped LUTs -> '
               f'{graph.lut_stats["packed_luts"]} multi-output macros')
     

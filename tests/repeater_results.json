@@ -1,0 +1,9784 @@
+[
+  {
+    "name": "line_14",
+    "signal_blocks": 15,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "9c77fba54c51de293908f66d580c592167a6ecb0376c93faf0165647e921062d",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00029490800079656765,
+      "placements": [],
+      "samples_seconds": [
+        0.000505910997162573,
+        0.00029490800079656765,
+        0.0002791359984257724
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.000330090999341337,
+      "placements": [],
+      "samples_seconds": [
+        0.00036496399843599647,
+        0.000330090999341337,
+        0.00031842899988987483
+      ]
+    }
+  },
+  {
+    "name": "line_15",
+    "signal_blocks": 16,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "6443deab7b71d5e35827311a21f0badcc4cc22c5a78256958c4c3271a9aa437b",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.00035548700179788284,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0003938490008295048,
+        0.00035548700179788284,
+        0.00034850899828597903
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0003431859986449126,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0003483439977571834,
+        0.0003431859986449126,
+        0.0003383490002306644
+      ]
+    }
+  },
+  {
+    "name": "line_16",
+    "signal_blocks": 17,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "aa7b71ea32c9ea081d8fdc036137ab2e76395070cae5c1236b47731003277d54",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.0003706860006786883,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.00038999800017336383,
+        0.0003706860006786883,
+        0.0003640159993665293
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.00036316200203145854,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.00036316200203145854,
+        0.0003676390006148722,
+        0.0003537230004440062
+      ]
+    }
+  },
+  {
+    "name": "line_29",
+    "signal_blocks": 30,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "e19791c30ed30e1b99a2611bba6a6a8d80ef5cc855ecd200da442ebed3c309df",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.0006111539987614378,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006511339997814503,
+        0.0006111539987614378,
+        0.0006052259996067733
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0006415119969460648,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006471150009019766,
+        0.0006415119969460648,
+        0.0006322459994407836
+      ]
+    }
+  },
+  {
+    "name": "line_30",
+    "signal_blocks": 31,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "d98834c45c50996fc671b009389b27cb66563ff5927f6edd81d6ba4f116d47b7",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0007338750001508743,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0007587799991597421,
+        0.0007338750001508743,
+        0.0007210660005512182
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0006673710013274103,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006724579980073031,
+        0.0006673710013274103,
+        0.0006614710000576451
+      ]
+    }
+  },
+  {
+    "name": "line_31",
+    "signal_blocks": 32,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "19106ed88c2544c71fd96292895993c13fc8d7323eed130e329633f45aba1d5b",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0007509829993068706,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0007840979997126851,
+        0.0007509829993068706,
+        0.0007397270019282587
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0006804069998906925,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            30,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006925710003997665,
+        0.0006804069998906925,
+        0.0006800000010116491
+      ]
+    }
+  },
+  {
+    "name": "line_32",
+    "signal_blocks": 33,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "464c4cbdf906763945c6d8e4ffa6201df9dce1785cd13e32b9f910e47af4d9ac",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0007754889993520919,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0008185970000340603,
+        0.0007754889993520919,
+        0.0007655789995624218
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0007064579986035824,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0007065989993861876,
+        0.0007015299997874536,
+        0.0007064579986035824
+      ]
+    }
+  },
+  {
+    "name": "line_45",
+    "signal_blocks": 46,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "a80559f7f8b750385f27c96b3600672165068deaa5dbd3fc9a64b5fef892a928",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.001185720000648871,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012139190002926625,
+        0.001185720000648871,
+        0.0011551009993127082
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0010011259983002674,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010199809985351749,
+        0.0010011259983002674,
+        0.0009876069998426829
+      ]
+    }
+  },
+  {
+    "name": "line_46",
+    "signal_blocks": 47,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "56533203655c83d31759c9c34358218ed0a96ad65e4c1f5e36ea656fc5201835",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0011852610005007591,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012297280009079259,
+        0.001176342000690056,
+        0.0011852610005007591
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0010240390001854394,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010588529985398054,
+        0.0010185690007347148,
+        0.0010240390001854394
+      ]
+    }
+  },
+  {
+    "name": "line_47",
+    "signal_blocks": 48,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "315d89fd298220d1b55c613a35a310429158deebf2780f73757b243c43a8ff8e",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0012053099999320693,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012542980002763215,
+        0.0012053099999320693,
+        0.0011937890012632124
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.001049530997988768,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            46,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010645279980963096,
+        0.0010320559995307121,
+        0.001049530997988768
+      ]
+    }
+  },
+  {
+    "name": "line_48",
+    "signal_blocks": 49,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "9b79875fbcbbb186989bdc0e0c635ddd82d2410a34039dbf5da0fc9b0875cdf5",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0012368610005069058,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001268470998184057,
+        0.001232665999850724,
+        0.0012368610005069058
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.001074916999641573,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010856389999389648,
+        0.001074916999641573,
+        0.001053830001183087
+      ]
+    }
+  },
+  {
+    "name": "line_62",
+    "signal_blocks": 63,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "2f1c29e3bfae927fdabb8ee78cdf80ffb4a451d2236bb640febce025dec9e18d",
+    "baseline": {
+      "repeaters": 4,
+      "seconds": 0.0017416500013496261,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            59,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0017786579992389306,
+        0.0017416500013496261,
+        0.0017300969993812032
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0014104309993854258,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0014240819982660469,
+        0.0014036890024726745,
+        0.0014104309993854258
+      ]
+    }
+  },
+  {
+    "name": "line_63",
+    "signal_blocks": 64,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "9e9b3dce19bcd2636baf14be85c45d27f238976034d824adbca9f8ef430b837a",
+    "baseline": {
+      "repeaters": 4,
+      "seconds": 0.0017663729995547328,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            59,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0018171019983128645,
+        0.0017663729995547328,
+        0.0017417279996152502
+      ]
+    },
+    "optimized": {
+      "repeaters": 4,
+      "seconds": 0.001445117999537615,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            62,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001445117999537615,
+        0.0014559940027538687,
+        0.0014227179999579675
+      ]
+    }
+  },
+  {
+    "name": "line_94",
+    "signal_blocks": 95,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "f22722876fb721123c309388f540b6eb7ecdf6ec090ccc2dcd9179a6721edc38",
+    "baseline": {
+      "repeaters": 6,
+      "seconds": 0.0029531660002248827,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            59,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            74,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            89,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0030010629998287186,
+        0.0029350600016186945,
+        0.0029531660002248827
+      ]
+    },
+    "optimized": {
+      "repeaters": 5,
+      "seconds": 0.002249574001325527,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            63,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            79,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0022659630012640264,
+        0.002249574001325527,
+        0.0022414710001612548
+      ]
+    }
+  },
+  {
+    "name": "line_95",
+    "signal_blocks": 96,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "9c1f2b70ee8a49b8f2ce8e555463861c2f13ab5eddd1732f0c50d3d67892b93e",
+    "baseline": {
+      "repeaters": 6,
+      "seconds": 0.0029938890002085827,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            59,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            74,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            89,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0030282869993243366,
+        0.0029938890002085827,
+        0.002962493999802973
+      ]
+    },
+    "optimized": {
+      "repeaters": 6,
+      "seconds": 0.002279480002471246,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            63,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            79,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            94,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.002281081000546692,
+        0.0022540230020240415,
+        0.002279480002471246
+      ]
+    }
+  },
+  {
+    "name": "fork_10_14",
+    "signal_blocks": 39,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "31af53f2f3417450abe5e1ce1dd7ba224fb0573131a5319f27651cea0d9e5d7e",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0009019110002554953,
+      "placements": [
+        [
+          [
+            10,
+            1,
+            -4
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            1,
+            4
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009598719989298843,
+        0.0009019110002554953,
+        0.0008932240016292781
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0008538789988961071,
+      "placements": [
+        [
+          [
+            9,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0008700969992787577,
+        0.0008418979996349663,
+        0.0008538789988961071
+      ]
+    }
+  },
+  {
+    "name": "fork_12_13",
+    "signal_blocks": 39,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "7f51ec67a666973c98b7e6a6a006c2da94da898f0f77d153a5b69cce661def43",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.000908976999198785,
+      "placements": [
+        [
+          [
+            12,
+            1,
+            -2
+          ],
+          "south"
+        ],
+        [
+          [
+            12,
+            1,
+            2
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009808040013012942,
+        0.000908976999198785,
+        0.000905509998119669
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0008515640001860447,
+      "placements": [
+        [
+          [
+            11,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0008718069984752219,
+        0.0008515640001860447,
+        0.0008457779986201786
+      ]
+    }
+  },
+  {
+    "name": "fork_13_14",
+    "signal_blocks": 42,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "f25b64ee1ea99b7e60bb05ae06832701f701f1c36c7fc458b47411645b9983e9",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0009857889999693725,
+      "placements": [
+        [
+          [
+            13,
+            1,
+            -1
+          ],
+          "south"
+        ],
+        [
+          [
+            13,
+            1,
+            1
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.001026152000122238,
+        0.0009857889999693725,
+        0.0009754300008353312
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.000913973999558948,
+      "placements": [
+        [
+          [
+            12,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009324359998572618,
+        0.000913973999558948,
+        0.0009138220011664089
+      ]
+    }
+  },
+  {
+    "name": "fork_14_16",
+    "signal_blocks": 47,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "b754cd900c32424eab82f4f6ae040c1f8edef190cc70ecb4860d4541e5667fcc",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0012167519998911303,
+      "placements": [
+        [
+          [
+            13,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            14,
+            1,
+            -14
+          ],
+          "south"
+        ],
+        [
+          [
+            14,
+            1,
+            14
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012636179999390151,
+        0.0012167519998911303,
+        0.001201430000946857
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0010165390012844,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            -1
+          ],
+          "south"
+        ],
+        [
+          [
+            14,
+            1,
+            1
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.001029432998620905,
+        0.0010165390012844,
+        0.0009841610008152202
+      ]
+    }
+  },
+  {
+    "name": "fork_26_14",
+    "signal_blocks": 55,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "889f21b216bc5a7a2acaab044ed9bef6849e1d2fb4894975f30685544930688d",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0014844030010863207,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            1,
+            -3
+          ],
+          "south"
+        ],
+        [
+          [
+            26,
+            1,
+            3
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.00178848200084758,
+        0.0014518040006805677,
+        0.0014844030010863207
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0012862229996244423,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            25,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001318073998845648,
+        0.0012862229996244423,
+        0.001278570998692885
+      ]
+    }
+  },
+  {
+    "name": "comb_shared_trunk",
+    "signal_blocks": 165,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "4fdc15a314f2e93e1d76f39aef40c59ab9e4cd453ebadbfbbaebc5d7d7fd777b",
+    "baseline": {
+      "repeaters": 12,
+      "seconds": 0.007971106002514716,
+      "placements": [
+        [
+          [
+            10,
+            1,
+            -4
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            1,
+            4
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            1,
+            -3
+          ],
+          "south"
+        ],
+        [
+          [
+            26,
+            1,
+            3
+          ],
+          "north"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            42,
+            1,
+            -2
+          ],
+          "south"
+        ],
+        [
+          [
+            42,
+            1,
+            2
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            58,
+            1,
+            -1
+          ],
+          "south"
+        ],
+        [
+          [
+            58,
+            1,
+            1
+          ],
+          "north"
+        ],
+        [
+          [
+            59,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.008186969000234967,
+        0.007971106002514716,
+        0.007939572999021038
+      ]
+    },
+    "optimized": {
+      "repeaters": 4,
+      "seconds": 0.0039683060022071,
+      "placements": [
+        [
+          [
+            9,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            25,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            41,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            57,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.004071994000696577,
+        0.003935728000215022,
+        0.0039683060022071
+      ]
+    }
+  },
+  {
+    "name": "sparse_corner_landings",
+    "signal_blocks": 43,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "2bdcee5361c4b3caee0971a2b9f742031d42b5c007061a53dc69495f5ccc67fe",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0009506389978923835,
+      "placements": [
+        [
+          [
+            11,
+            1,
+            3
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            1,
+            11
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009835559976636432,
+        0.0009506389978923835,
+        0.0009252390009351075
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0008910100004868582,
+      "placements": [
+        [
+          [
+            11,
+            1,
+            4
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            1,
+            11
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009143640018010046,
+        0.0008910100004868582,
+        0.0008883539994712919
+      ]
+    }
+  },
+  {
+    "name": "stairs_up",
+    "signal_blocks": 43,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "3d878fbae9c169bc4f92332d6ecbb4c9800dfe73565adda262eb3d92b71ea75b",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0010586279968265444,
+      "placements": [
+        [
+          [
+            10,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            25,
+            9,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            40,
+            9,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010804269986692816,
+        0.0010586279968265444,
+        0.0010314569990441669
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0009999339999922086,
+      "placements": [
+        [
+          [
+            10,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            9,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            41,
+            9,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009597340031177737,
+        0.0009999339999922086,
+        0.0011648269974102732
+      ]
+    }
+  },
+  {
+    "name": "stairs_down",
+    "signal_blocks": 43,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "048d19743ca4dafe845c943c013c509863e9edd66a230a39f4322383b4dea824",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0011492420017020777,
+      "placements": [
+        [
+          [
+            5,
+            1,
+            0
+          ],
+          "east"
+        ],
+        [
+          [
+            20,
+            9,
+            0
+          ],
+          "east"
+        ],
+        [
+          [
+            28,
+            9,
+            0
+          ],
+          "east"
+        ]
+      ],
+      "samples_seconds": [
+        0.001730722997308476,
+        0.0011492420017020777,
+        0.0011163939998368733
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0011252449985477142,
+      "placements": [
+        [
+          [
+            4,
+            1,
+            0
+          ],
+          "east"
+        ],
+        [
+          [
+            20,
+            9,
+            0
+          ],
+          "east"
+        ],
+        [
+          [
+            27,
+            9,
+            0
+          ],
+          "east"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012965150017407723,
+        0.0011252449985477142,
+        0.0009254190008505248
+      ]
+    }
+  },
+  {
+    "name": "stacked_crossing",
+    "signal_blocks": 98,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "b67903df35482ba232a023284c8d4bca50e07c19103f733373fc276d3d71f078",
+    "baseline": {
+      "repeaters": 6,
+      "seconds": 0.002543072998378193,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            3,
+            -10
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            3,
+            5
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            3,
+            20
+          ],
+          "north"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            44,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0026234709985146765,
+        0.002543072998378193,
+        0.00248366000232636
+      ]
+    },
+    "optimized": {
+      "repeaters": 6,
+      "seconds": 0.002141332999599399,
+      "placements": [
+        [
+          [
+            15,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            3,
+            -9
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            3,
+            7
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            3,
+            23
+          ],
+          "north"
+        ],
+        [
+          [
+            31,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.002141332999599399,
+        0.002284092002810212,
+        0.0020997949977754615
+      ]
+    }
+  },
+  {
+    "name": "fixed_repeaters",
+    "signal_blocks": 64,
+    "fixed_repeaters": 2,
+    "expected_error": false,
+    "geometry_sha256": "22bdbbd557458cea98a88ba739cef5bd067de58eb53cea56f164b428a8360cc3",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0015610269983881153,
+      "placements": [
+        [
+          [
+            24,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            39,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            54,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0016311370018229354,
+        0.0015610269983881153,
+        0.0015534039994236082
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.00135494300047867,
+      "placements": [
+        [
+          [
+            25,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            41,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            57,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0013769739998679142,
+        0.00135494300047867,
+        0.0013423870004771743
+      ]
+    }
+  },
+  {
+    "name": "only_landing_at_zero",
+    "signal_blocks": 23,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "77263c08f58713955b8a7b749439f2169eca735fd21c82cb0fc6aac797455ea1",
+    "baseline": {
+      "error": "No powered flat straight repeater site before (15, 15, 0) from (0, 1, 0); add a landing to this route",
+      "seconds": 0.00017971800116356462,
+      "samples_seconds": [
+        0.0002136369985237252,
+        0.00017971800116356462,
+        0.00017154099987237714
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.00033168799927807413,
+      "placements": [
+        [
+          [
+            15,
+            15,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0003465029985818546,
+        0.0003304450001451187,
+        0.00033168799927807413
+      ]
+    }
+  },
+  {
+    "name": "small_loop_long_feed",
+    "signal_blocks": 55,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "249698ec45a06a66dd55060e0a4e970e33249cb4146e68e2e555c432b5d9044a",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0012034399987896904,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012361819972284138,
+        0.0012034399987896904,
+        0.0011765170020225924
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0026906219973170664,
+      "placements": [
+        [
+          [
+            12,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0027025550007238053,
+        0.002663142000528751,
+        0.0026906219973170664
+      ]
+    }
+  },
+  {
+    "name": "loop_9_3",
+    "signal_blocks": 21,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "31ee01286d486e1dc30fb3e58f88a0ae72ef407f879111b50f58b0f65e3a297a",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.00047269900096580386,
+      "placements": [
+        [
+          [
+            12,
+            1,
+            2
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.000520585999765899,
+        0.00047269900096580386,
+        0.0004619879982783459
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0010139689984498546,
+      "placements": [
+        [
+          [
+            1,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0010349639997002669,
+        0.001011964999634074,
+        0.0010139689984498546
+      ]
+    }
+  },
+  {
+    "name": "loop_12_3",
+    "signal_blocks": 24,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "2886cd0fa9d28da1a7d17d57623f24235cff6d39420686245130f2abe817e380",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.0004974240000592545,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0005422520007414278,
+        0.0004974240000592545,
+        0.0004927789996145293
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0011149700003443286,
+      "placements": [
+        [
+          [
+            3,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001115869999921415,
+        0.0011149700003443286,
+        0.001105726001696894
+      ]
+    }
+  },
+  {
+    "name": "loop_27_3",
+    "signal_blocks": 39,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "aadd34eca905f567da8cce3ff0dbfd69daeffc1d6389668c989b6998a02bf8ab",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0009071339991351124,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.00094044099751045,
+        0.0009065600024769083,
+        0.0009071339991351124
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0019961549987783656,
+      "placements": [
+        [
+          [
+            2,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            18,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001998642001126427,
+        0.0019961549987783656,
+        0.0019858980012941174
+      ]
+    }
+  },
+  {
+    "name": "loop_3_12",
+    "signal_blocks": 51,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "cc7d9479a2705bb39a8b2cac7bd333c43f18b1501059cd9c7349b1ddad470bb5",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0011455530002422165,
+      "placements": [
+        [
+          [
+            3,
+            1,
+            11
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0011872780014527962,
+        0.0011455530002422165,
+        0.0011361710021446925
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0024426810014119837,
+      "placements": [
+        [
+          [
+            3,
+            1,
+            8
+          ],
+          "north"
+        ],
+        [
+          [
+            12,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0024796389989205636,
+        0.0024426810014119837,
+        0.0024304500002472196
+      ]
+    }
+  },
+  {
+    "name": "loop_1_7",
+    "signal_blocks": 29,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "78d0a28db06c22f623022f909c06957a2887fd959cd35efcccc27e4075c64b1f",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.000618922000285238,
+      "placements": [
+        [
+          [
+            8,
+            1,
+            6
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006738369993399829,
+        0.000618922000285238,
+        0.0006096759971114807
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.001333442000031937,
+      "placements": [
+        [
+          [
+            2,
+            1,
+            0
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0013580149970948696,
+        0.001333442000031937,
+        0.0013328029999684077
+      ]
+    }
+  },
+  {
+    "name": "loop_0_17",
+    "signal_blocks": 68,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "63c0f73afd191d5cf71a5f783380287d82180828ad45fe3b44321228a9bb1721",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0017304949979006778,
+      "placements": [
+        [
+          [
+            0,
+            1,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            17,
+            1,
+            12
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0017840590007836,
+        0.0017304949979006778,
+        0.0017165460012620315
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.003678050998132676,
+      "placements": [
+        [
+          [
+            0,
+            1,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            17,
+            1,
+            12
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.003678050998132676,
+        0.0036936510005034506,
+        0.003670796002552379
+      ]
+    }
+  },
+  {
+    "name": "loop_15_17",
+    "signal_blocks": 83,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "f4411efac675da424eece86b27c2e5a5b159f56b4c469137bb8abfaf4cc36deb",
+    "baseline": {
+      "repeaters": 4,
+      "seconds": 0.002300447999004973,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            15,
+            1,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            32,
+            1,
+            12
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0023612500008312054,
+        0.002300447999004973,
+        0.002282221001223661
+      ]
+    },
+    "optimized": {
+      "repeaters": 4,
+      "seconds": 0.004945328997564502,
+      "placements": [
+        [
+          [
+            14,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            15,
+            1,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            29,
+            1,
+            0
+          ],
+          "west"
+        ],
+        [
+          [
+            32,
+            1,
+            12
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.004945328997564502,
+        0.004946190001646755,
+        0.004937417001201538
+      ]
+    }
+  },
+  {
+    "name": "two_sources_12",
+    "signal_blocks": 13,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "15ac718de0691587339d98a0e2bf54c41c5e4474f9704b1bc87fb6fce484def9",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0004208959981042426,
+      "placements": [],
+      "samples_seconds": [
+        0.00046152300274115987,
+        0.0004208959981042426,
+        0.0004175970025244169
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0006647049995081034,
+      "placements": [],
+      "samples_seconds": [
+        0.0006782939999538939,
+        0.0006647049995081034,
+        0.0006625880014325958
+      ]
+    }
+  },
+  {
+    "name": "two_sources_40",
+    "signal_blocks": 41,
+    "fixed_repeaters": 0,
+    "expected_error": true,
+    "geometry_sha256": "fcc2efcf53a135e92470d6294452ad310d663a27e30afabb05ca0bc8b66becb5",
+    "baseline": {
+      "error": "Repeater direction disconnected a branch from (40, 1, 0)",
+      "seconds": 0.000587278998864349,
+      "samples_seconds": [
+        0.0006257519999053329,
+        0.000587278998864349,
+        0.0005794899989268743
+      ]
+    },
+    "optimized": {
+      "error": "Repeater direction disconnected a branch from (40, 1, 0)",
+      "seconds": 0.0010657610000635032,
+      "samples_seconds": [
+        0.0010657610000635032,
+        0.0010731759975897148,
+        0.0010491280008864123
+      ]
+    }
+  },
+  {
+    "name": "impossible_staircase",
+    "signal_blocks": 22,
+    "fixed_repeaters": 0,
+    "expected_error": true,
+    "geometry_sha256": "fae594fe84ecd6480b672133c451e0381a25edbee41d55d7fec02f4567f015d1",
+    "baseline": {
+      "error": "No powered flat straight repeater site before (15, 16, 0) from (0, 1, 0); add a landing to this route",
+      "seconds": 0.0001690440003585536,
+      "samples_seconds": [
+        0.00019801000235020183,
+        0.0001690440003585536,
+        0.00016599499940639362
+      ]
+    },
+    "optimized": {
+      "error": "No powered flat straight repeater site from (0, 1, 0); add a landing to this route",
+      "seconds": 0.00020760699771926738,
+      "samples_seconds": [
+        0.00021869299962418154,
+        0.00020760699771926738,
+        0.0002020779975282494
+      ]
+    }
+  },
+  {
+    "name": "router_straight",
+    "signal_blocks": 3,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "17557a7aab283397068d39f571d03bdb2f65dc286e08fbedc62651088e927ac1",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 5.21059992024675e-05,
+      "placements": [],
+      "samples_seconds": [
+        7.320299846469425e-05,
+        5.21059992024675e-05,
+        4.919200000585988e-05
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 6.476400085375644e-05,
+      "placements": [],
+      "samples_seconds": [
+        7.107599958544597e-05,
+        6.476400085375644e-05,
+        6.174299778649583e-05
+      ]
+    }
+  },
+  {
+    "name": "router_uphill",
+    "signal_blocks": 9,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "35331bf8332d600ef6513b4f1fd0f42b02fa91de62328e936e76b9f197e7deaa",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00011867300054291263,
+      "placements": [],
+      "samples_seconds": [
+        0.000141652999445796,
+        0.00011867300054291263,
+        0.00011240399908274412
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.00013717199908569455,
+      "placements": [],
+      "samples_seconds": [
+        0.00014318100147647783,
+        0.00013717199908569455,
+        0.0001327739992120769
+      ]
+    }
+  },
+  {
+    "name": "router_bottom_source_downhill",
+    "signal_blocks": 14,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "0a19dc122c87f9c28effd7ee9047ba59542386b226730df9f8f0a971f19f45d7",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00020600499919964932,
+      "placements": [],
+      "samples_seconds": [
+        0.0002162950004276354,
+        0.00020600499919964932,
+        0.00018872099826694466
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0003135619990644045,
+      "placements": [],
+      "samples_seconds": [
+        0.0002726460006670095,
+        0.00038544400013051927,
+        0.0003135619990644045
+      ]
+    }
+  },
+  {
+    "name": "router_top_to_top",
+    "signal_blocks": 11,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "c04a235ae1e1081ac7107469ab125d0b912f3830efd1b0ebe808f24268db6820",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00016512600268470123,
+      "placements": [],
+      "samples_seconds": [
+        0.00019815899941022508,
+        0.00016512600268470123,
+        0.00016264599980786443
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.00019762200099648908,
+      "placements": [],
+      "samples_seconds": [
+        0.0002135499998985324,
+        0.00019762200099648908,
+        0.00019239399989601225
+      ]
+    }
+  },
+  {
+    "name": "router_bottom_to_bottom",
+    "signal_blocks": 11,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "d3402275015f1312f648805edd7728421a29581719c4df2be6252131df176709",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00017736800145939924,
+      "placements": [],
+      "samples_seconds": [
+        0.0001961800007848069,
+        0.00017736800145939924,
+        0.00015808399984962307
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.00020592299915733747,
+      "placements": [],
+      "samples_seconds": [
+        0.00020554500224534422,
+        0.00021907799964537844,
+        0.00020592299915733747
+      ]
+    }
+  },
+  {
+    "name": "router_mixed_height_fanout",
+    "signal_blocks": 19,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "2c1f9e7f9e4ccd7bdb8fe78a99eac6ef96e6d1d875fd627f10caaaca2eeddba1",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0002966840002045501,
+      "placements": [],
+      "samples_seconds": [
+        0.00035143700006301515,
+        0.0002966840002045501,
+        0.0002590889998828061
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0003554720024112612,
+      "placements": [],
+      "samples_seconds": [
+        0.00036808399818255566,
+        0.0003080400019825902,
+        0.0003554720024112612
+      ]
+    }
+  },
+  {
+    "name": "router_crossing",
+    "signal_blocks": 22,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "a72decbd45668ef1a2373b9b130efde5137b38b83a027999786e50344d2e85a1",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00038432300061685964,
+      "placements": [],
+      "samples_seconds": [
+        0.00048006799988797866,
+        0.00038432300061685964,
+        0.0003301530014141463
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.00042276900057913736,
+      "placements": [],
+      "samples_seconds": [
+        0.00042276900057913736,
+        0.00042508499973337166,
+        0.00040793800144456327
+      ]
+    }
+  },
+  {
+    "name": "router_stacked_straight_two_levels",
+    "signal_blocks": 22,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "125a2458cb962e8c1557d4c02bb071908789651382bdebe6ff5202e5c7f681bb",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00046751799891353585,
+      "placements": [],
+      "samples_seconds": [
+        0.00046751799891353585,
+        0.0005065969999122899,
+        0.0004120539997529704
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0004406459993333556,
+      "placements": [],
+      "samples_seconds": [
+        0.0005278619973978493,
+        0.0004406459993333556,
+        0.000433265002357075
+      ]
+    }
+  },
+  {
+    "name": "router_perpendicular_two_levels",
+    "signal_blocks": 18,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "7c22e5d3f673d08353badbc363b428ede044789267e53e6fce295e09d494afc8",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0003064900010940619,
+      "placements": [],
+      "samples_seconds": [
+        0.0003476609999779612,
+        0.0003064900010940619,
+        0.0003031189989997074
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0003523499981383793,
+      "placements": [],
+      "samples_seconds": [
+        0.00036835500213783234,
+        0.0003523499981383793,
+        0.00035051699887844734
+      ]
+    }
+  },
+  {
+    "name": "router_repeater_crossing_two_levels",
+    "signal_blocks": 54,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "ba071b6f1e5f63a028bacc0e6f30082b0d4cf4205f806672e6abc88fc588c877",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0011775929997384083,
+      "placements": [
+        [
+          [
+            13,
+            2,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            2,
+            1
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0011775929997384083,
+        0.0012231559994688723,
+        0.001145152000390226
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0011531400014064275,
+      "placements": [
+        [
+          [
+            14,
+            2,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            30,
+            2,
+            1
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0011531400014064275,
+        0.0012282970019441564,
+        0.0011263769993092865
+      ]
+    }
+  },
+  {
+    "name": "router_crossing_rising_wire",
+    "signal_blocks": 22,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "5e94c214e9a4917782cd54aaadf36f87be461ffb98b00b64ccb1b02e4d3334a6",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00036112800080445595,
+      "placements": [],
+      "samples_seconds": [
+        0.00036112800080445595,
+        0.0003264049992139917,
+        0.00042692900024121627
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.00041030200009117834,
+      "placements": [],
+      "samples_seconds": [
+        0.0005374060019676108,
+        0.00041030200009117834,
+        0.00040756299858912826
+      ]
+    }
+  },
+  {
+    "name": "router_crossing_falling_wire",
+    "signal_blocks": 22,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "1df39161ae6668aeb27f7aee43e94eb0ed762632e6c01b6312c5c4ac44884692",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00036628899761126377,
+      "placements": [],
+      "samples_seconds": [
+        0.00039948099947650917,
+        0.0003554360009729862,
+        0.00036628899761126377
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0004142950019740965,
+      "placements": [],
+      "samples_seconds": [
+        0.0004178260023763869,
+        0.0004142950019740965,
+        0.00039961199945537373
+      ]
+    }
+  },
+  {
+    "name": "router_two_sloped_crossings",
+    "signal_blocks": 42,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "7de587395268534be80ed9cc96dac946a4da3809cc981e4b56b4462a6e90d750",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.000901502000488108,
+      "placements": [
+        [
+          [
+            5,
+            2,
+            10
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            4,
+            6
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0009706119999464136,
+        0.000901502000488108,
+        0.0008427069988101721
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0008347669972863514,
+      "placements": [
+        [
+          [
+            5,
+            2,
+            10
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            4,
+            7
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0008522169991920236,
+        0.0008216659989557229,
+        0.0008347669972863514
+      ]
+    }
+  },
+  {
+    "name": "router_stacked_pins",
+    "signal_blocks": 18,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "5eda85ed9b24dd22eaa77098000a4d65cd74b5c698917c8c0ceb0d1f0035a32e",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.00026411900034872815,
+      "placements": [],
+      "samples_seconds": [
+        0.00030275700191850774,
+        0.00026411900034872815,
+        0.0002499029978935141
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0002920829974755179,
+      "placements": [],
+      "samples_seconds": [
+        0.0002964669984066859,
+        0.0002873410012398381,
+        0.0002920829974755179
+      ]
+    }
+  },
+  {
+    "name": "router_parallel_heights",
+    "signal_blocks": 25,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "3cebe5177e6240e4a93b8a05bba513932735c6331887a46559667525a847f14d",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0003250539994041901,
+      "placements": [],
+      "samples_seconds": [
+        0.000370663998182863,
+        0.0003250539994041901,
+        0.0003133310019620694
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0003538000019034371,
+      "placements": [],
+      "samples_seconds": [
+        0.000363531999028055,
+        0.0003538000019034371,
+        0.00034770500133163296
+      ]
+    }
+  },
+  {
+    "name": "router_long_horizontal",
+    "signal_blocks": 51,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "e02d2784c0a290efdfe432268eb7bc7ff2e0e05add8fa50211e5ff3f98249a52",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0012699229991994798,
+      "placements": [
+        [
+          [
+            13,
+            0,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            0,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            43,
+            0,
+            1
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0013197209991631098,
+        0.0012699229991994798,
+        0.0012585170006786939
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0011060180004278664,
+      "placements": [
+        [
+          [
+            14,
+            0,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            30,
+            0,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            46,
+            0,
+            1
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0011273359996266663,
+        0.0011060180004278664,
+        0.001098283002647804
+      ]
+    }
+  },
+  {
+    "name": "router_tall_uphill",
+    "signal_blocks": 33,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "00b51f95698e49e6cd056702446bb140bdc6814039e4aaf1b066b2dd8b6de903",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0006498049988294952,
+      "placements": [
+        [
+          [
+            0,
+            8,
+            10
+          ],
+          "north"
+        ],
+        [
+          [
+            0,
+            17,
+            21
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006882589987071697,
+        0.0006498049988294952,
+        0.0006376320015988313
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0005619559997285251,
+      "placements": [
+        [
+          [
+            0,
+            8,
+            10
+          ],
+          "north"
+        ],
+        [
+          [
+            0,
+            17,
+            21
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0005619559997285251,
+        0.0005534289994102437,
+        0.0007069300008879509
+      ]
+    }
+  },
+  {
+    "name": "router_tall_downhill",
+    "signal_blocks": 33,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "be9eee34ca0ceafb883c9f74d3aa6bdf8b6ee18f1283d6c4e8b41462aed3b461",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0006323999987216666,
+      "placements": [
+        [
+          [
+            0,
+            7,
+            11
+          ],
+          "south"
+        ],
+        [
+          [
+            0,
+            16,
+            22
+          ],
+          "south"
+        ]
+      ],
+      "samples_seconds": [
+        0.0006700509984511882,
+        0.0006323999987216666,
+        0.0006288690019573551
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.000541825000254903,
+      "placements": [
+        [
+          [
+            0,
+            7,
+            11
+          ],
+          "south"
+        ],
+        [
+          [
+            0,
+            16,
+            22
+          ],
+          "south"
+        ]
+      ],
+      "samples_seconds": [
+        0.0005606960003206041,
+        0.0005397040004027076,
+        0.000541825000254903
+      ]
+    }
+  },
+  {
+    "name": "router_long_fanout",
+    "signal_blocks": 57,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "2d305df970529b7fd9d8f5caf11cb735c36546833539657ba97f5e5644af3dfe",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.0012933799989696126,
+      "placements": [
+        [
+          [
+            13,
+            5,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            0,
+            3
+          ],
+          "west"
+        ],
+        [
+          [
+            39,
+            0,
+            3
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0013569139991886914,
+        0.0012933799989696126,
+        0.001288560997636523
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0011216530001547653,
+      "placements": [
+        [
+          [
+            14,
+            5,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            0,
+            3
+          ],
+          "west"
+        ],
+        [
+          [
+            39,
+            0,
+            3
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001142479002737673,
+        0.0011027940017811488,
+        0.0011216530001547653
+      ]
+    }
+  },
+  {
+    "name": "router_tall_multilevel_fanout",
+    "signal_blocks": 52,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "5524ee7942a4da8c7c4b13adc9ca04a2e7dac4da26c8d5f8b77041d412425fd4",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.001149887997598853,
+      "placements": [
+        [
+          [
+            4,
+            18,
+            4
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            9,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            19,
+            4,
+            7
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0012019759997201618,
+        0.001149887997598853,
+        0.0011279800019110553
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0008797480004432146,
+      "placements": [
+        [
+          [
+            4,
+            18,
+            4
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            9,
+            1
+          ],
+          "west"
+        ],
+        [
+          [
+            19,
+            4,
+            8
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0008863570001267362,
+        0.0008797480004432146,
+        0.0008686689980095252
+      ]
+    }
+  },
+  {
+    "name": "router_three_way_cycle",
+    "signal_blocks": 37,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "21c508d21c2b33337d58989fff647cfb66067403a16962e6a810aabb9f4c97ae",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0005737470019084867,
+      "placements": [],
+      "samples_seconds": [
+        0.0006134410032245796,
+        0.0005737470019084867,
+        0.0005557929980568588
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0006549990030180197,
+      "placements": [],
+      "samples_seconds": [
+        0.0006549990030180197,
+        0.0006397460019798018,
+        0.0008244540003943257
+      ]
+    }
+  },
+  {
+    "name": "router_interlocking_fanout",
+    "signal_blocks": 62,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "287df9fa76ad1bca595ad79ad80f7a3d650becfff501fe41b6eb5bd357ccc369",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.0010714819982240442,
+      "placements": [
+        [
+          [
+            5,
+            0,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001115031998779159,
+        0.0010714819982240442,
+        0.0010572860010142904
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0011158939996676054,
+      "placements": [
+        [
+          [
+            10,
+            3,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0011408500031393487,
+        0.0011158939996676054,
+        0.0011110460000054445
+      ]
+    }
+  },
+  {
+    "name": "router_obstacle_wall",
+    "signal_blocks": 25,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "7a4a6e9dd56160fe98e46ffc4810ba79cb0ce3c4e509e899cfdef2dcaadd9c93",
+    "baseline": {
+      "repeaters": 1,
+      "seconds": 0.0005120550013089087,
+      "placements": [
+        [
+          [
+            10,
+            6,
+            4
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0005534750016522594,
+        0.0005120550013089087,
+        0.0005048900020483416
+      ]
+    },
+    "optimized": {
+      "repeaters": 1,
+      "seconds": 0.0005137150001246482,
+      "placements": [
+        [
+          [
+            10,
+            6,
+            5
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.0005209060000197496,
+        0.0005110319980303757,
+        0.0005137150001246482
+      ]
+    }
+  },
+  {
+    "name": "router_dense_permutation",
+    "signal_blocks": 83,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "c8624c7f56cec4cecf5e127897a548adce9d4c69a3a6e7b00d0c45bc6edaa9fc",
+    "baseline": {
+      "repeaters": 2,
+      "seconds": 0.0014608470009989105,
+      "placements": [
+        [
+          [
+            6,
+            0,
+            3
+          ],
+          "east"
+        ],
+        [
+          [
+            9,
+            0,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0015064399995026179,
+        0.0014608470009989105,
+        0.0014356950014189351
+      ]
+    },
+    "optimized": {
+      "repeaters": 2,
+      "seconds": 0.0014509749998978805,
+      "placements": [
+        [
+          [
+            6,
+            0,
+            3
+          ],
+          "east"
+        ],
+        [
+          [
+            10,
+            0,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.001480015998822637,
+        0.0014509749998978805,
+        0.0014506410007015802
+      ]
+    }
+  },
+  {
+    "name": "router_fifteen_net_stress",
+    "signal_blocks": 224,
+    "fixed_repeaters": 0,
+    "expected_error": false,
+    "geometry_sha256": "23ff0cf1d3b4694ed952c09c60306296da51d6ddced433d498d6ea3a6b2f98d2",
+    "baseline": {
+      "repeaters": 3,
+      "seconds": 0.003697522999573266,
+      "placements": [
+        [
+          [
+            11,
+            0,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            4,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            37,
+            6,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0037911529980192427,
+        0.003697522999573266,
+        0.003660582002339652
+      ]
+    },
+    "optimized": {
+      "repeaters": 3,
+      "seconds": 0.0037188979986240156,
+      "placements": [
+        [
+          [
+            12,
+            0,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            4,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            37,
+            6,
+            5
+          ],
+          "west"
+        ]
+      ],
+      "samples_seconds": [
+        0.0037545970008068252,
+        0.0037053100022603758,
+        0.0037188979986240156
+      ]
+    }
+  },
+  {
+    "name": "adder4",
+    "signal_blocks": 784,
+    "fixed_repeaters": 30,
+    "expected_error": false,
+    "geometry_sha256": "23c219ada5a399eebb9aa82c3435b236c003ad508b23e60d17bec6ee0d00862a",
+    "baseline": {
+      "repeaters": 30,
+      "seconds": 0.015612090002832701,
+      "placements": [
+        [
+          [
+            0,
+            0,
+            28
+          ],
+          "north"
+        ],
+        [
+          [
+            0,
+            0,
+            43
+          ],
+          "north"
+        ],
+        [
+          [
+            3,
+            0,
+            48
+          ],
+          "east"
+        ],
+        [
+          [
+            4,
+            0,
+            20
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            36
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            23
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            2,
+            19
+          ],
+          "east"
+        ],
+        [
+          [
+            7,
+            0,
+            36
+          ],
+          "east"
+        ],
+        [
+          [
+            9,
+            0,
+            5
+          ],
+          "east"
+        ],
+        [
+          [
+            13,
+            0,
+            22
+          ],
+          "east"
+        ],
+        [
+          [
+            13,
+            2,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            14,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            15,
+            2,
+            17
+          ],
+          "west"
+        ],
+        [
+          [
+            16,
+            0,
+            35
+          ],
+          "north"
+        ],
+        [
+          [
+            16,
+            0,
+            55
+          ],
+          "north"
+        ],
+        [
+          [
+            17,
+            2,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            17,
+            2,
+            35
+          ],
+          "east"
+        ],
+        [
+          [
+            18,
+            0,
+            55
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            29
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            52
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            2,
+            7
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            4,
+            3
+          ],
+          "west"
+        ],
+        [
+          [
+            22,
+            0,
+            25
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            2,
+            19
+          ],
+          "east"
+        ],
+        [
+          [
+            22,
+            2,
+            22
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            0,
+            46
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            0,
+            35
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            23
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.01575553699876764,
+        0.015592640000249958,
+        0.015612090002832701
+      ]
+    },
+    "optimized": {
+      "repeaters": 29,
+      "seconds": 0.02272774999801186,
+      "placements": [
+        [
+          [
+            0,
+            0,
+            30
+          ],
+          "north"
+        ],
+        [
+          [
+            0,
+            0,
+            46
+          ],
+          "north"
+        ],
+        [
+          [
+            3,
+            0,
+            48
+          ],
+          "east"
+        ],
+        [
+          [
+            5,
+            2,
+            19
+          ],
+          "east"
+        ],
+        [
+          [
+            6,
+            0,
+            24
+          ],
+          "north"
+        ],
+        [
+          [
+            7,
+            0,
+            36
+          ],
+          "east"
+        ],
+        [
+          [
+            7,
+            2,
+            21
+          ],
+          "west"
+        ],
+        [
+          [
+            9,
+            0,
+            5
+          ],
+          "east"
+        ],
+        [
+          [
+            13,
+            0,
+            22
+          ],
+          "east"
+        ],
+        [
+          [
+            13,
+            2,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            14,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            15,
+            2,
+            17
+          ],
+          "west"
+        ],
+        [
+          [
+            16,
+            0,
+            35
+          ],
+          "north"
+        ],
+        [
+          [
+            16,
+            0,
+            56
+          ],
+          "north"
+        ],
+        [
+          [
+            17,
+            2,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            17,
+            2,
+            35
+          ],
+          "east"
+        ],
+        [
+          [
+            18,
+            0,
+            56
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            29
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            54
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            2,
+            7
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            4,
+            3
+          ],
+          "west"
+        ],
+        [
+          [
+            22,
+            0,
+            25
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            40
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            2,
+            19
+          ],
+          "east"
+        ],
+        [
+          [
+            22,
+            2,
+            22
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            0,
+            46
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            5
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            0,
+            36
+          ],
+          "east"
+        ],
+        [
+          [
+            30,
+            0,
+            24
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.022660478000034345,
+        0.02273012200021185,
+        0.02272774999801186
+      ]
+    }
+  },
+  {
+    "name": "adder4_lut",
+    "signal_blocks": 881,
+    "fixed_repeaters": 76,
+    "expected_error": false,
+    "geometry_sha256": "19d235a02c31f552efd9ab4a8f5d7aaee2acd5a9c533462e8f5cfefdc59c0ddc",
+    "baseline": {
+      "repeaters": 10,
+      "seconds": 0.008354506000614492,
+      "placements": [
+        [
+          [
+            10,
+            0,
+            10
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            0,
+            25
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            0,
+            40
+          ],
+          "south"
+        ],
+        [
+          [
+            12,
+            1,
+            38
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            38
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            9
+          ],
+          "south"
+        ],
+        [
+          [
+            20,
+            0,
+            24
+          ],
+          "south"
+        ],
+        [
+          [
+            20,
+            0,
+            39
+          ],
+          "south"
+        ],
+        [
+          [
+            22,
+            1,
+            38
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            1,
+            38
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.008401319999393309,
+        0.008354506000614492,
+        0.008278822999272961
+      ]
+    },
+    "optimized": {
+      "repeaters": 10,
+      "seconds": 0.011387452999770176,
+      "placements": [
+        [
+          [
+            10,
+            0,
+            7
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            0,
+            23
+          ],
+          "south"
+        ],
+        [
+          [
+            10,
+            0,
+            39
+          ],
+          "south"
+        ],
+        [
+          [
+            12,
+            1,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            1,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            5
+          ],
+          "south"
+        ],
+        [
+          [
+            20,
+            0,
+            21
+          ],
+          "south"
+        ],
+        [
+          [
+            20,
+            0,
+            37
+          ],
+          "south"
+        ],
+        [
+          [
+            22,
+            1,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            1,
+            39
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.011452708000433631,
+        0.01134183199974359,
+        0.011387452999770176
+      ]
+    }
+  },
+  {
+    "name": "alu8_lut",
+    "signal_blocks": 10428,
+    "fixed_repeaters": 631,
+    "expected_error": false,
+    "geometry_sha256": "384f919e496b7c9dfeaeb00412531236689d52d5ec3219f6f56c35df436bf37b",
+    "baseline": {
+      "repeaters": 349,
+      "seconds": 0.28336799099997734,
+      "placements": [
+        [
+          [
+            0,
+            1,
+            274
+          ],
+          "north"
+        ],
+        [
+          [
+            2,
+            0,
+            42
+          ],
+          "north"
+        ],
+        [
+          [
+            2,
+            0,
+            57
+          ],
+          "north"
+        ],
+        [
+          [
+            2,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            36
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            51
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            66
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            211
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            226
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            241
+          ],
+          "north"
+        ],
+        [
+          [
+            5,
+            2,
+            30
+          ],
+          "east"
+        ],
+        [
+          [
+            6,
+            0,
+            38
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            53
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            68
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            210
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            225
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            240
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            259
+          ],
+          "south"
+        ],
+        [
+          [
+            6,
+            0,
+            274
+          ],
+          "south"
+        ],
+        [
+          [
+            8,
+            0,
+            18
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            0,
+            43
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            0,
+            58
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            1,
+            73
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            4,
+            5
+          ],
+          "east"
+        ],
+        [
+          [
+            9,
+            5,
+            117
+          ],
+          "west"
+        ],
+        [
+          [
+            9,
+            5,
+            162
+          ],
+          "north"
+        ],
+        [
+          [
+            9,
+            5,
+            203
+          ],
+          "north"
+        ],
+        [
+          [
+            9,
+            7,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            10,
+            0,
+            86
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            101
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            116
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            131
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            146
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            3,
+            244
+          ],
+          "east"
+        ],
+        [
+          [
+            10,
+            3,
+            248
+          ],
+          "west"
+        ],
+        [
+          [
+            11,
+            0,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            11,
+            0,
+            72
+          ],
+          "east"
+        ],
+        [
+          [
+            11,
+            1,
+            245
+          ],
+          "west"
+        ],
+        [
+          [
+            11,
+            2,
+            31
+          ],
+          "east"
+        ],
+        [
+          [
+            11,
+            5,
+            247
+          ],
+          "north"
+        ],
+        [
+          [
+            12,
+            1,
+            110
+          ],
+          "north"
+        ],
+        [
+          [
+            12,
+            1,
+            204
+          ],
+          "west"
+        ],
+        [
+          [
+            12,
+            5,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            14,
+            5,
+            28
+          ],
+          "west"
+        ],
+        [
+          [
+            14,
+            5,
+            158
+          ],
+          "north"
+        ],
+        [
+          [
+            15,
+            5,
+            113
+          ],
+          "west"
+        ],
+        [
+          [
+            16,
+            0,
+            247
+          ],
+          "north"
+        ],
+        [
+          [
+            16,
+            3,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            16,
+            5,
+            4
+          ],
+          "east"
+        ],
+        [
+          [
+            16,
+            7,
+            159
+          ],
+          "east"
+        ],
+        [
+          [
+            18,
+            0,
+            13
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            118
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            171
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            186
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            260
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            275
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            1,
+            239
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            5,
+            201
+          ],
+          "east"
+        ],
+        [
+          [
+            18,
+            7,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            19,
+            0,
+            33
+          ],
+          "west"
+        ],
+        [
+          [
+            19,
+            4,
+            242
+          ],
+          "east"
+        ],
+        [
+          [
+            19,
+            5,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            20,
+            0,
+            83
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            98
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            167
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            182
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            197
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            1,
+            239
+          ],
+          "north"
+        ],
+        [
+          [
+            21,
+            3,
+            248
+          ],
+          "west"
+        ],
+        [
+          [
+            22,
+            0,
+            45
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            88
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            103
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            1,
+            190
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            3,
+            117
+          ],
+          "north"
+        ],
+        [
+          [
+            23,
+            3,
+            205
+          ],
+          "east"
+        ],
+        [
+          [
+            23,
+            7,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            23,
+            7,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            0,
+            28
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            43
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            58
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            72
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            87
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            102
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            1,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            2,
+            75
+          ],
+          "east"
+        ],
+        [
+          [
+            25,
+            5,
+            164
+          ],
+          "north"
+        ],
+        [
+          [
+            25,
+            7,
+            163
+          ],
+          "east"
+        ],
+        [
+          [
+            25,
+            7,
+            202
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            0,
+            74
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            125
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            140
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            1,
+            239
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            2,
+            72
+          ],
+          "east"
+        ],
+        [
+          [
+            26,
+            3,
+            159
+          ],
+          "south"
+        ],
+        [
+          [
+            27,
+            1,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            27,
+            3,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            27,
+            3,
+            247
+          ],
+          "east"
+        ],
+        [
+          [
+            27,
+            5,
+            32
+          ],
+          "north"
+        ],
+        [
+          [
+            27,
+            5,
+            70
+          ],
+          "west"
+        ],
+        [
+          [
+            27,
+            5,
+            201
+          ],
+          "east"
+        ],
+        [
+          [
+            27,
+            5,
+            245
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            123
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            138
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            153
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            166
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            181
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            196
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            5,
+            157
+          ],
+          "east"
+        ],
+        [
+          [
+            28,
+            5,
+            159
+          ],
+          "east"
+        ],
+        [
+          [
+            30,
+            0,
+            124
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            139
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            154
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            250
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            265
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            280
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            2,
+            31
+          ],
+          "west"
+        ],
+        [
+          [
+            30,
+            3,
+            242
+          ],
+          "east"
+        ],
+        [
+          [
+            30,
+            5,
+            113
+          ],
+          "west"
+        ],
+        [
+          [
+            30,
+            7,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            31,
+            3,
+            5
+          ],
+          "east"
+        ],
+        [
+          [
+            31,
+            3,
+            163
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            7,
+            204
+          ],
+          "east"
+        ],
+        [
+          [
+            32,
+            0,
+            38
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            53
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            68
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            122
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            137
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            152
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            246
+          ],
+          "west"
+        ],
+        [
+          [
+            32,
+            0,
+            253
+          ],
+          "south"
+        ],
+        [
+          [
+            32,
+            0,
+            268
+          ],
+          "south"
+        ],
+        [
+          [
+            32,
+            0,
+            283
+          ],
+          "south"
+        ],
+        [
+          [
+            33,
+            5,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            34,
+            0,
+            42
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            57
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            72
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            123
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            138
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            153
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            216
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            231
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            1,
+            274
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            2,
+            113
+          ],
+          "east"
+        ],
+        [
+          [
+            35,
+            0,
+            161
+          ],
+          "west"
+        ],
+        [
+          [
+            35,
+            5,
+            27
+          ],
+          "west"
+        ],
+        [
+          [
+            35,
+            5,
+            157
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            42
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            57
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            72
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            85
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            100
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            116
+          ],
+          "west"
+        ],
+        [
+          [
+            36,
+            0,
+            122
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            137
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            152
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            217
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            232
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            247
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            2,
+            205
+          ],
+          "east"
+        ],
+        [
+          [
+            37,
+            3,
+            27
+          ],
+          "east"
+        ],
+        [
+          [
+            37,
+            5,
+            30
+          ],
+          "north"
+        ],
+        [
+          [
+            37,
+            5,
+            204
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            40
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            55
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            102
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            153
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            231
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            241
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            2,
+            161
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            171
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            186
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            258
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            273
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            1,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            2,
+            31
+          ],
+          "east"
+        ],
+        [
+          [
+            40,
+            2,
+            115
+          ],
+          "east"
+        ],
+        [
+          [
+            41,
+            5,
+            117
+          ],
+          "north"
+        ],
+        [
+          [
+            41,
+            5,
+            243
+          ],
+          "east"
+        ],
+        [
+          [
+            42,
+            0,
+            165
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            180
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            195
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            254
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            269
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            284
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            5,
+            4
+          ],
+          "west"
+        ],
+        [
+          [
+            42,
+            5,
+            156
+          ],
+          "east"
+        ],
+        [
+          [
+            43,
+            2,
+            117
+          ],
+          "east"
+        ],
+        [
+          [
+            43,
+            3,
+            2
+          ],
+          "east"
+        ],
+        [
+          [
+            43,
+            5,
+            116
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            78
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            93
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            108
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            167
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            182
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            197
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            212
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            227
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            241
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            248
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            263
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            278
+          ],
+          "north"
+        ],
+        [
+          [
+            45,
+            3,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            45,
+            7,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            0,
+            85
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            100
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            124
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            139
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            154
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            160
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            175
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            190
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            205
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            220
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            235
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            253
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            268
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            283
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            2,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            2,
+            203
+          ],
+          "east"
+        ],
+        [
+          [
+            47,
+            0,
+            116
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            5,
+            29
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            15
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            77
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            92
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            107
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            130
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            145
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            157
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            205
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            220
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            235
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            250
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            265
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            280
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            1,
+            190
+          ],
+          "north"
+        ],
+        [
+          [
+            49,
+            0,
+            70
+          ],
+          "west"
+        ],
+        [
+          [
+            50,
+            0,
+            15
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            84
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            99
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            133
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            148
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            217
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            232
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            242
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            2,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            51,
+            0,
+            119
+          ],
+          "east"
+        ],
+        [
+          [
+            52,
+            0,
+            32
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            62
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            87
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            102
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            115
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            160
+          ],
+          "east"
+        ],
+        [
+          [
+            52,
+            0,
+            209
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            224
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            239
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            1,
+            145
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            1,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            2,
+            204
+          ],
+          "east"
+        ],
+        [
+          [
+            53,
+            0,
+            158
+          ],
+          "west"
+        ],
+        [
+          [
+            53,
+            5,
+            3
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            74
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            166
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            181
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            196
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            55,
+            5,
+            31
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            28
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            174
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            189
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            201
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            3,
+            160
+          ],
+          "north"
+        ],
+        [
+          [
+            57,
+            0,
+            71
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            15
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            121
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            136
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            151
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            168
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            183
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            198
+          ],
+          "north"
+        ],
+        [
+          [
+            59,
+            2,
+            164
+          ],
+          "east"
+        ],
+        [
+          [
+            60,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            62
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            123
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            138
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            153
+          ],
+          "north"
+        ],
+        [
+          [
+            61,
+            0,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            62,
+            0,
+            82
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            97
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            127
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            142
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            157
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            1,
+            67
+          ],
+          "north"
+        ],
+        [
+          [
+            63,
+            1,
+            6
+          ],
+          "west"
+        ],
+        [
+          [
+            63,
+            2,
+            2
+          ],
+          "west"
+        ],
+        [
+          [
+            63,
+            5,
+            29
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            82
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            97
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            124
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            139
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            154
+          ],
+          "north"
+        ],
+        [
+          [
+            65,
+            0,
+            27
+          ],
+          "east"
+        ],
+        [
+          [
+            65,
+            5,
+            2
+          ],
+          "west"
+        ],
+        [
+          [
+            66,
+            0,
+            13
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            84
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            99
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            114
+          ],
+          "north"
+        ],
+        [
+          [
+            67,
+            0,
+            70
+          ],
+          "east"
+        ],
+        [
+          [
+            68,
+            0,
+            12
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            83
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            98
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            113
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            10
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            25
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            44
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            71,
+            0,
+            30
+          ],
+          "east"
+        ],
+        [
+          [
+            71,
+            0,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            72,
+            0,
+            45
+          ],
+          "north"
+        ],
+        [
+          [
+            72,
+            0,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            74,
+            0,
+            74
+          ],
+          "north"
+        ],
+        [
+          [
+            74,
+            1,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            75,
+            2,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            75,
+            5,
+            31
+          ],
+          "north"
+        ],
+        [
+          [
+            78,
+            0,
+            15
+          ],
+          "north"
+        ],
+        [
+          [
+            78,
+            0,
+            26
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.2865680729992164,
+        0.28292623999732314,
+        0.28336799099997734
+      ]
+    },
+    "optimized": {
+      "repeaters": 327,
+      "seconds": 0.2160204319989134,
+      "placements": [
+        [
+          [
+            0,
+            1,
+            275
+          ],
+          "north"
+        ],
+        [
+          [
+            2,
+            0,
+            45
+          ],
+          "north"
+        ],
+        [
+          [
+            2,
+            0,
+            61
+          ],
+          "north"
+        ],
+        [
+          [
+            3,
+            2,
+            30
+          ],
+          "east"
+        ],
+        [
+          [
+            3,
+            5,
+            4
+          ],
+          "north"
+        ],
+        [
+          [
+            3,
+            5,
+            76
+          ],
+          "north"
+        ],
+        [
+          [
+            3,
+            5,
+            247
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            37
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            53
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            216
+          ],
+          "north"
+        ],
+        [
+          [
+            4,
+            0,
+            232
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            55
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            211
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            227
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            241
+          ],
+          "north"
+        ],
+        [
+          [
+            6,
+            0,
+            257
+          ],
+          "south"
+        ],
+        [
+          [
+            6,
+            0,
+            273
+          ],
+          "south"
+        ],
+        [
+          [
+            6,
+            3,
+            204
+          ],
+          "east"
+        ],
+        [
+          [
+            8,
+            0,
+            20
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            0,
+            45
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            0,
+            61
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            1,
+            74
+          ],
+          "north"
+        ],
+        [
+          [
+            8,
+            3,
+            244
+          ],
+          "east"
+        ],
+        [
+          [
+            9,
+            5,
+            163
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            10,
+            0,
+            87
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            103
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            119
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            135
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            0,
+            151
+          ],
+          "north"
+        ],
+        [
+          [
+            10,
+            2,
+            31
+          ],
+          "east"
+        ],
+        [
+          [
+            10,
+            5,
+            117
+          ],
+          "west"
+        ],
+        [
+          [
+            10,
+            7,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            11,
+            0,
+            72
+          ],
+          "east"
+        ],
+        [
+          [
+            11,
+            3,
+            248
+          ],
+          "west"
+        ],
+        [
+          [
+            11,
+            5,
+            248
+          ],
+          "north"
+        ],
+        [
+          [
+            12,
+            1,
+            111
+          ],
+          "north"
+        ],
+        [
+          [
+            12,
+            1,
+            204
+          ],
+          "west"
+        ],
+        [
+          [
+            13,
+            0,
+            31
+          ],
+          "south"
+        ],
+        [
+          [
+            13,
+            5,
+            162
+          ],
+          "north"
+        ],
+        [
+          [
+            15,
+            3,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            15,
+            5,
+            28
+          ],
+          "west"
+        ],
+        [
+          [
+            16,
+            0,
+            247
+          ],
+          "north"
+        ],
+        [
+          [
+            16,
+            3,
+            244
+          ],
+          "east"
+        ],
+        [
+          [
+            16,
+            5,
+            113
+          ],
+          "west"
+        ],
+        [
+          [
+            18,
+            0,
+            5
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            21
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            172
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            188
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            261
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            0,
+            277
+          ],
+          "north"
+        ],
+        [
+          [
+            18,
+            1,
+            240
+          ],
+          "north"
+        ],
+        [
+          [
+            19,
+            5,
+            119
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            33
+          ],
+          "west"
+        ],
+        [
+          [
+            20,
+            0,
+            88
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            104
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            119
+          ],
+          "west"
+        ],
+        [
+          [
+            20,
+            0,
+            168
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            184
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            1,
+            240
+          ],
+          "north"
+        ],
+        [
+          [
+            20,
+            5,
+            201
+          ],
+          "east"
+        ],
+        [
+          [
+            21,
+            0,
+            73
+          ],
+          "east"
+        ],
+        [
+          [
+            22,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            63
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            84
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            100
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            1,
+            191
+          ],
+          "north"
+        ],
+        [
+          [
+            22,
+            7,
+            159
+          ],
+          "east"
+        ],
+        [
+          [
+            23,
+            7,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            23,
+            7,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            24,
+            0,
+            29
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            45
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            61
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            89
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            105
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            1,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            24,
+            5,
+            157
+          ],
+          "east"
+        ],
+        [
+          [
+            24,
+            7,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            25,
+            5,
+            164
+          ],
+          "north"
+        ],
+        [
+          [
+            25,
+            7,
+            163
+          ],
+          "east"
+        ],
+        [
+          [
+            26,
+            0,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            129
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            145
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            0,
+            160
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            1,
+            240
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            2,
+            72
+          ],
+          "east"
+        ],
+        [
+          [
+            26,
+            3,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            26,
+            3,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            26,
+            3,
+            158
+          ],
+          "south"
+        ],
+        [
+          [
+            26,
+            5,
+            75
+          ],
+          "west"
+        ],
+        [
+          [
+            26,
+            5,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            26,
+            7,
+            202
+          ],
+          "west"
+        ],
+        [
+          [
+            27,
+            3,
+            242
+          ],
+          "east"
+        ],
+        [
+          [
+            27,
+            5,
+            33
+          ],
+          "north"
+        ],
+        [
+          [
+            27,
+            5,
+            70
+          ],
+          "west"
+        ],
+        [
+          [
+            28,
+            0,
+            124
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            140
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            177
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            0,
+            193
+          ],
+          "north"
+        ],
+        [
+          [
+            28,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            29,
+            2,
+            75
+          ],
+          "east"
+        ],
+        [
+          [
+            30,
+            0,
+            127
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            143
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            245
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            261
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            0,
+            277
+          ],
+          "north"
+        ],
+        [
+          [
+            30,
+            2,
+            31
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            0,
+            164
+          ],
+          "east"
+        ],
+        [
+          [
+            31,
+            1,
+            205
+          ],
+          "west"
+        ],
+        [
+          [
+            31,
+            3,
+            205
+          ],
+          "east"
+        ],
+        [
+          [
+            32,
+            0,
+            39
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            55
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            69
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            123
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            139
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            32,
+            0,
+            249
+          ],
+          "south"
+        ],
+        [
+          [
+            32,
+            0,
+            265
+          ],
+          "south"
+        ],
+        [
+          [
+            32,
+            0,
+            281
+          ],
+          "south"
+        ],
+        [
+          [
+            32,
+            2,
+            113
+          ],
+          "east"
+        ],
+        [
+          [
+            32,
+            5,
+            113
+          ],
+          "west"
+        ],
+        [
+          [
+            32,
+            5,
+            242
+          ],
+          "east"
+        ],
+        [
+          [
+            33,
+            5,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            34,
+            0,
+            43
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            59
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            126
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            142
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            155
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            217
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            0,
+            233
+          ],
+          "north"
+        ],
+        [
+          [
+            34,
+            1,
+            275
+          ],
+          "north"
+        ],
+        [
+          [
+            35,
+            7,
+            161
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            34
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            50
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            66
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            89
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            105
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            132
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            148
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            218
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            0,
+            234
+          ],
+          "north"
+        ],
+        [
+          [
+            36,
+            2,
+            205
+          ],
+          "east"
+        ],
+        [
+          [
+            36,
+            5,
+            27
+          ],
+          "west"
+        ],
+        [
+          [
+            37,
+            0,
+            116
+          ],
+          "west"
+        ],
+        [
+          [
+            37,
+            3,
+            27
+          ],
+          "east"
+        ],
+        [
+          [
+            37,
+            5,
+            31
+          ],
+          "north"
+        ],
+        [
+          [
+            37,
+            5,
+            158
+          ],
+          "north"
+        ],
+        [
+          [
+            37,
+            5,
+            244
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            44
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            0,
+            248
+          ],
+          "west"
+        ],
+        [
+          [
+            38,
+            1,
+            103
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            154
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            1,
+            232
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            3,
+            74
+          ],
+          "north"
+        ],
+        [
+          [
+            38,
+            5,
+            118
+          ],
+          "west"
+        ],
+        [
+          [
+            39,
+            0,
+            119
+          ],
+          "east"
+        ],
+        [
+          [
+            39,
+            5,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            171
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            187
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            262
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            0,
+            278
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            40,
+            2,
+            115
+          ],
+          "east"
+        ],
+        [
+          [
+            41,
+            0,
+            161
+          ],
+          "west"
+        ],
+        [
+          [
+            41,
+            2,
+            117
+          ],
+          "east"
+        ],
+        [
+          [
+            41,
+            2,
+            158
+          ],
+          "east"
+        ],
+        [
+          [
+            41,
+            5,
+            119
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            114
+          ],
+          "east"
+        ],
+        [
+          [
+            42,
+            0,
+            172
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            188
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            200
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            248
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            264
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            0,
+            280
+          ],
+          "north"
+        ],
+        [
+          [
+            42,
+            3,
+            2
+          ],
+          "east"
+        ],
+        [
+          [
+            42,
+            5,
+            4
+          ],
+          "west"
+        ],
+        [
+          [
+            43,
+            2,
+            33
+          ],
+          "east"
+        ],
+        [
+          [
+            44,
+            0,
+            84
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            100
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            174
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            190
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            202
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            218
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            234
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            255
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            271
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            0,
+            287
+          ],
+          "north"
+        ],
+        [
+          [
+            44,
+            3,
+            6
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            0,
+            86
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            102
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            112
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            131
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            147
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            161
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            177
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            193
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            209
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            225
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            241
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            254
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            270
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            0,
+            286
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            46,
+            2,
+            160
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            2,
+            203
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            5,
+            156
+          ],
+          "east"
+        ],
+        [
+          [
+            46,
+            7,
+            161
+          ],
+          "east"
+        ],
+        [
+          [
+            47,
+            0,
+            116
+          ],
+          "west"
+        ],
+        [
+          [
+            47,
+            5,
+            30
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            16
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            76
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            92
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            108
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            131
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            147
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            207
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            223
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            239
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            263
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            0,
+            279
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            1,
+            191
+          ],
+          "north"
+        ],
+        [
+          [
+            48,
+            3,
+            30
+          ],
+          "east"
+        ],
+        [
+          [
+            49,
+            0,
+            248
+          ],
+          "east"
+        ],
+        [
+          [
+            49,
+            3,
+            118
+          ],
+          "east"
+        ],
+        [
+          [
+            50,
+            0,
+            16
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            72
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            88
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            104
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            126
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            142
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            156
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            214
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            230
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            0,
+            242
+          ],
+          "north"
+        ],
+        [
+          [
+            50,
+            2,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            51,
+            5,
+            161
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            33
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            49
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            65
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            89
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            105
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            203
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            219
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            0,
+            235
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            1,
+            146
+          ],
+          "north"
+        ],
+        [
+          [
+            52,
+            2,
+            159
+          ],
+          "west"
+        ],
+        [
+          [
+            53,
+            2,
+            115
+          ],
+          "north"
+        ],
+        [
+          [
+            53,
+            5,
+            3
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            173
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            0,
+            189
+          ],
+          "north"
+        ],
+        [
+          [
+            54,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            55,
+            5,
+            32
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            30
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            167
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            183
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            199
+          ],
+          "north"
+        ],
+        [
+          [
+            56,
+            0,
+            204
+          ],
+          "east"
+        ],
+        [
+          [
+            57,
+            0,
+            156
+          ],
+          "east"
+        ],
+        [
+          [
+            58,
+            0,
+            16
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            70
+          ],
+          "east"
+        ],
+        [
+          [
+            58,
+            0,
+            129
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            145
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            175
+          ],
+          "north"
+        ],
+        [
+          [
+            58,
+            0,
+            191
+          ],
+          "north"
+        ],
+        [
+          [
+            59,
+            2,
+            114
+          ],
+          "east"
+        ],
+        [
+          [
+            60,
+            0,
+            40
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            56
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            126
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            142
+          ],
+          "north"
+        ],
+        [
+          [
+            60,
+            0,
+            158
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            84
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            100
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            115
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            131
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            147
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            0,
+            163
+          ],
+          "north"
+        ],
+        [
+          [
+            62,
+            1,
+            68
+          ],
+          "north"
+        ],
+        [
+          [
+            63,
+            0,
+            27
+          ],
+          "east"
+        ],
+        [
+          [
+            63,
+            1,
+            6
+          ],
+          "west"
+        ],
+        [
+          [
+            63,
+            5,
+            30
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            89
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            105
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            129
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            145
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            0,
+            161
+          ],
+          "north"
+        ],
+        [
+          [
+            64,
+            2,
+            2
+          ],
+          "west"
+        ],
+        [
+          [
+            65,
+            2,
+            74
+          ],
+          "east"
+        ],
+        [
+          [
+            66,
+            0,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            91
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            107
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            0,
+            116
+          ],
+          "north"
+        ],
+        [
+          [
+            66,
+            5,
+            2
+          ],
+          "west"
+        ],
+        [
+          [
+            68,
+            0,
+            14
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            85
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            101
+          ],
+          "north"
+        ],
+        [
+          [
+            68,
+            0,
+            117
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            11
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            26
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            31
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            47
+          ],
+          "north"
+        ],
+        [
+          [
+            70,
+            0,
+            63
+          ],
+          "north"
+        ],
+        [
+          [
+            72,
+            0,
+            34
+          ],
+          "north"
+        ],
+        [
+          [
+            72,
+            0,
+            50
+          ],
+          "north"
+        ],
+        [
+          [
+            72,
+            0,
+            66
+          ],
+          "north"
+        ],
+        [
+          [
+            74,
+            0,
+            75
+          ],
+          "north"
+        ],
+        [
+          [
+            74,
+            1,
+            60
+          ],
+          "north"
+        ],
+        [
+          [
+            75,
+            5,
+            32
+          ],
+          "north"
+        ],
+        [
+          [
+            78,
+            0,
+            16
+          ],
+          "north"
+        ],
+        [
+          [
+            78,
+            0,
+            26
+          ],
+          "north"
+        ]
+      ],
+      "samples_seconds": [
+        0.22127109700159053,
+        0.2160204319989134,
+        0.21580611000172212
+      ]
+    }
+  },
+  {
+    "name": "dlatch",
+    "signal_blocks": 12,
+    "fixed_repeaters": 2,
+    "expected_error": false,
+    "geometry_sha256": "38d2127af73bc3c3da94253735fbef084f50eac3df561c3b3eba78251ea4a53e",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0002353509989916347,
+      "placements": [],
+      "samples_seconds": [
+        0.0002895780016842764,
+        0.0002353509989916347,
+        0.0002326180001546163
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0003817450015048962,
+      "placements": [],
+      "samples_seconds": [
+        0.0003893710018019192,
+        0.0003817450015048962,
+        0.00037516300290008076
+      ]
+    }
+  },
+  {
+    "name": "storage_demo",
+    "signal_blocks": 50,
+    "fixed_repeaters": 4,
+    "expected_error": false,
+    "geometry_sha256": "f11bd09dce5bf2ad799f244eb756cda265f946e6ade6da69394a12cd1a954c9a",
+    "baseline": {
+      "repeaters": 0,
+      "seconds": 0.0011219029984204099,
+      "placements": [],
+      "samples_seconds": [
+        0.0011866280001413543,
+        0.0011219029984204099,
+        0.0011173759994562715
+      ]
+    },
+    "optimized": {
+      "repeaters": 0,
+      "seconds": 0.0017122270000982098,
+      "placements": [],
+      "samples_seconds": [
+        0.0017503790004411712,
+        0.001710624997940613,
+        0.0017122270000982098
+      ]
+    }
+  }
+]

@@ -5,6 +5,7 @@ from pathlib import Path
 import mcschematic
 from generate_lut import build_lut
 from tests.generate_adder_test import placement_commands,fill_commands
+from tests.live_test_runtime import install_chunk_lease
 
 
 def generate(destination,origin):
@@ -38,7 +39,9 @@ def generate(destination,origin):
         write(f'place_{n}',fill_commands((-1,-1,-4),(16,6,36),origin)+placement_commands(structure.getStructure(),origin))
         for address in list(range(1<<n))+list(reversed(range(1<<n))):
             cases.append((n,address,data[address],gate.size_z))
-    write('start',[f'schedule clear lut_test:check_{i}' for i in range(len(cases))]+['scoreboard objectives add lut_test dummy',
+    install_chunk_lease(write,'lut_test',(origin[0]-1,origin[1]-1,origin[2]-4),
+                        (origin[0]+16,origin[1]+6,origin[2]+36))
+    write('start',[f'schedule clear lut_test:check_{i}' for i in range(len(cases))]+['function lut_test:load','scoreboard objectives add lut_test dummy',
                    'scoreboard players set #passed lut_test 0','scoreboard players set #failed lut_test 0',
                    'data modify storage lut_test:results failures set value []',
                    'data modify storage lut_test:results status set value "running"','function lut_test:apply_0'])
@@ -67,7 +70,7 @@ def generate(destination,origin):
     write('fail',['scoreboard players add #failed lut_test 1','data modify storage lut_test:results failures append value {}']+
           [f'execute store result storage lut_test:results failures[-1].{name} int 1 run scoreboard players get #{name} lut_test'
            for name in ('case','width','address','expected','actual')])
-    write('finish',['data modify storage lut_test:results status set value "complete"']+
+    write('finish',['data modify storage lut_test:results status set value "complete"','function lut_test:unload']+
           [f'execute store result storage lut_test:results {name} int 1 run scoreboard players get #{name} lut_test' for name in ('passed','failed')])
     print(f'{len(cases)} exhaustive forward/reverse address checks; tick sprint {len(cases)*80+200}t')
 
